@@ -20,12 +20,6 @@ Functions:
   User interface.
 
 
-Install:
---------
- 
-Good look!
-
-
 Tables:
 -------
 
@@ -44,16 +38,6 @@ Index:
 
 - unread:  
   unread_since, parent: has only unread items.
-
-
-Todo:
------
-
-- Fix *TODO* in this README;
-- Fix security issues;
-- Convert to servless/chalice;
-- Add suport to multi user;
-- make all this ugly code pretty;
 
 
 API:
@@ -101,3 +85,20 @@ CRUD operations for sources/items
 - DELETE  
   Delete source or item.
   Expects json with 'uid' of source or item.
+
+
+Install:
+--------
+ 
+Since it does't have cloudformation yet is not easy, install it on aws.
+Good look!
+
+
+Todo:
+-----
+
+- Fix *TODO* in this README;
+- Fix security issues;
+- Convert to servless/chalice;
+- Add suport to multi user;
+- make all this ugly code pretty;
