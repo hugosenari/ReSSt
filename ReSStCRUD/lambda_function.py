@@ -150,13 +150,14 @@ def all_items(operation, x, table):
 
 
 class Operation(Subscriptable):
-    DELETE = lambda x, T: Operation._del(T, x.get('parent'))
+    DELETE = lambda x, T: Operation._del(T, x.get('uid'))
     GET =    lambda x, T: ScanBy.get_by(**x)(x, T)
     PUT =    lambda x, T: Operation._update(table=T, **x)
-    POST =   lambda x, T: T.put_item(Item=dict(
-        parent=x.pop('parent', ROOT),
-        uid=Operation.uid(x.get('id'), **x),
-        **x))
+    POST =   lambda x, T: T.put_item(
+        Item=dict(
+            parent=x.pop('parent', ROOT),
+            uid=Operation.uid(x.get('id'), **x),
+            **x))
     DEFAULT = GET
 
     @staticmethod
