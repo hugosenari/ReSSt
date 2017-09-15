@@ -16,7 +16,7 @@ Functions:
 - ReSStOPMLImport:  
   API to import sources from OPML xml file.
 
-- ReSStUI *TODO*:
+- ReSStUI *TODO*:  
   User interface.
 
 
@@ -92,6 +92,12 @@ Install:
  
 Since it does't have cloudformation yet is not easy, install it on aws.
 Good look!
+
+- Create three python3 functions;
+    - Two for api gateway (ReSStCRUD,ReSStOPMLImport)
+    - One for cloudwatch (FeedMeReSSt)
+- Create one DynamoDB table (ReSSt)
+- Create three index (parent, feeds, unread)
 
 
 Todo:
