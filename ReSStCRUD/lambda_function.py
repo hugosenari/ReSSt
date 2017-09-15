@@ -143,10 +143,11 @@ class Paginator:
             yield result
 
 
-def all_items(operation, x, table):
-    for page in Paginator(operation, x, table)
-        for item in page['Items']:
-            yield item
+def all_items(parent, table):
+    if parent:
+        for page in Paginator(ScanBy.parent, {'parent': parent}, table)
+            for item in page['Items']:
+                yield item
 
 
 class Operation(Subscriptable):
@@ -164,35 +165,45 @@ class Operation(Subscriptable):
     def uid(mid=None, xmlUrl=None, link=None, title=None, **data):
         return uuid5(NAMESPACE_URL, mid or xmlUrl or link or title).hex
 
-    @staticmethod
-    def _update_method(table, **data):
+
+    @classmethod
+    def _do_ update(cls, method, table=None, uid=None, parentUid=None,
+        uids=set(), **data):
+        ids = {uid} if uid else set()
+        ids += set(uids) if uids else set()
+        ids += set(i['uid'] for i in all_items(parentUid, table))
+        if not ids:
+            raise ValueError('Undefined uid/uids/parentUid')
+        update = cls._update_method(table, **data)
+        result = []
+        for _id in uids:
+            result += [method(_id)]
+        return dict(uid=uid, parentUid=parentUid, uids=uids, result=result)
+
+    @classmethod
+    def _update(cls, uid=None, parentUid=None, uids=set(), **data):
         sets, values = [], {}
         for k, v in data.items():
             placeholder = ':_{}'.format(k)
             sets.append('{} = {}'.format(k), placeholder)
             values[placeholder] = v
         upex = 'SET {}'.format(','.join(sets))
-        def update_method(uid):
+        def method(uid):
             return table.update_item(Key={ 'uid': uid },
                 ExpressionAttributeValues=values,
                 UpdateExpression=upex)
-        return update_method
+        cls._do_update(uid=uid, parentUid=parentUid, uids=uids, **data)
 
     @classmethod
-    def _update(cls, uid=None, parentUid=None, table=None, uids=[], **data):
-        if not (uid or parentUid or uids):
-            raise ValueError('Undefined uid/uids/parentUid')
-        update = cls._update_method(table, **data)
-        if uid:
-            return update(uid)
-        suids = set(uids)
-        if parentUid:
-            items = ScanBy.parent({'parent': parentUid})['Items']
-            suids = suids + { item['uid'] for item in items }
-        result = {'Items': []}
-        for uid in suids:
-            result['Items'].append(update(uid))
-        return result
+    def _read(cls, uid=None, parentUid=None, uids=set(), **data):
+    upEx = '''REMOVE unread_since,
+              SET readed_at = if_not_exists(readed_at, :_now)'''
+    values = {':_now': now()}
+    def method(uid)
+        r = table.update_item(
+            Key={ 'uid': uid }, ExpressionAttributeValues=values,
+            UpdateExpression=upEx)
+    return ids
 
     @classmethod
     def _del(cls, table, uid=None, parent=None):
@@ -204,7 +215,7 @@ class Operation(Subscriptable):
         if parent:
             table.delete_item(Key=dict(uid=uid, parent=parent))
         result = []
-        for item in all_items(ScanBy.parent, {'parent': uid}, table):
+        for item in all_items(uid, table):
             result += [cls._del(table, uid=item['uid'], parent=item['parent'])]
         return dict(uid=uid, parent=parent, Items=result)
 

@@ -25,7 +25,7 @@ def _serializer(obj):
 
 def find_more_sources(table, next_token=None):
     filexp=Attr('xmlUrl').exists()
-    
+
     args = { 'FilterExpression': filexp }
     if INDEX_NAME:
         args['IndexName'] = INDEX_NAME
@@ -34,7 +34,7 @@ def find_more_sources(table, next_token=None):
     result = table.scan(**args)
     print('Feeds len ', len(result['Items']))
     return result
-    
+
 def read_sources(lambida, event):
     lambida.invoke(
         FunctionName="feedMeReSSt",
@@ -65,28 +65,28 @@ def filter_attrs(item):
     contents = item.get('content') or []
     result['content'] = [content.get('value') or ' ' for content in contents]
     medias = item.get('media_content') or []
-    result['media_content'] = [media.get('value') or ' ' for media in medias] 
+    result['media_content'] = [media.get('value') or ' ' for media in medias]
     return result
+
+def save_item(table, item):
+    i = filter_attrs(item)
+    try:
+        exps = ['{0} = if_not_exists({0}, :{0})'.format(k) for k in i.keys()]
+        upExp = 'SET ' + ','.join(exps)
+        exAttVal = { ':' + k : v for k, v in i.items() }
+        key = {'uid': item['uid'], 'parent': item['parent']}
+        table.update_item(Key=key, UpdateExpression=upExp,
+            ExpressionAttributeValues= exAttVal)
+        return item
+    except ClientError as e:
+        if e.response['Error']['Code'] != 'ConditionalCheckFailedException':
+            print('Failed to put ', i)
+            print(traceback.format_exception(None, e, e.__traceback__))
 
 def save_items(table, items):
     for item in set_uid(items):
-        i = filter_attrs(item)
-        try:
-            setExp = ','.join(['{0} = :{0}'.format(k) for k in i.keys()])
-            table.update_item(
-                ConditionExpression=Attr('imported_at').not_exists(),
-                Key={
-                    'uid': item['uid'],
-                    'parent': item['parent']
-                },
-                UpdateExpression='set ' + setExp,
-                ExpressionAttributeValues={ ':' + k : v for k, v in i.items() }
-            )
+        if save_item(table, item):
             yield item
-        except ClientError as e:
-            if e.response['Error']['Code'] != 'ConditionalCheckFailedException':
-                print('Failed to put ', i)
-                print(traceback.format_exception(None, e, e.__traceback__))
 
 def lambda_handler(event, context):
     dynamodb = boto3.resource('dynamodb')
@@ -105,7 +105,7 @@ def lambda_handler(event, context):
         result = find_more_sources(table, next_token)
         sources = result['Items']
         next_token = result.get('LastEvaluatedKey')
- 
+
     if sources or next_token:
         service = boto3.client('lambda')
         read_sources(service, {
