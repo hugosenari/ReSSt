@@ -62,6 +62,7 @@ CRUD operations for sources/items
   Expected query params to filter by:
   - uid=string, show an item/source by uid;
   - parent=string, scan item/source childs by uid;
+  - last=string, uid of last item found to paginate;
   - tree=string, make a tree of item/source by uid;
   - title=string, scan by item/source title;
   - link=string, scan by item link;
@@ -89,7 +90,7 @@ CRUD operations for sources/items
 
 Install:
 --------
- 
+
 Since it does't have cloudformation yet is not easy, install it on aws.
 Good look!
 
