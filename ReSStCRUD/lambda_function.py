@@ -74,8 +74,10 @@ class By(Subscriptable):
     ))
     DEFAULT = parent
 
-def params(x, filex=None, key=None):
+def params(x, filex=None, key=None, last=None):
     result = { }
+    if last:
+        result['ExclusiveStartKey'] = last
     if key:
         result['KeyConditionExpression'] = By.key(x, key)
     if filex:
@@ -127,8 +129,28 @@ class UpdateTo(Subscriptable):
     star = lambda x, T: False
 
 
+class Paginator:
+    def __init__(self, operation, x, table):
+        self.operation = operation
+        self.params = x
+        self.table = table
+
+    def __iter__(self):
+        result = {}
+        while result.get('LastEvaluatedKey') or 'Items' not in result:
+            self.params['last'] = result.get('LastEvaluatedKey')
+            result = self.operation(self.params, self.table)
+            yield result
+
+
+def all_items(operation, x, table):
+    for page in Paginator(operation, x, table)
+        for item in page['Items']:
+            yield item
+
+
 class Operation(Subscriptable):
-    DELETE = lambda x, T: Operation._delete(T, x.get('parent'))
+    DELETE = lambda x, T: Operation._del(T, x.get('parent'))
     GET =    lambda x, T: ScanBy.get_by(**x)(x, T)
     PUT =    lambda x, T: Operation._update(table=T, **x)
     POST =   lambda x, T: T.put_item(Item=dict(
@@ -172,16 +194,18 @@ class Operation(Subscriptable):
         return result
 
     @classmethod
-    def _delete(table, parent=None):
+    def _del(cls, table, uid=None, parent=None):
+        if not uid:
+            return ValueError('uid is undefined')
+        if not parent:
+            me = ScanBy.uid({'uid': uid}, table)['Items']
+            parent = me[0]['parent'] if me else parent
         if parent:
-            result = table.delete_item(Key={ 'uid': parent })
-            result['Items'] = result.get('Items', [])
-            subitems = ScanBy.parent({ 'parent': parent })['Items']
-            for subitem in subitems:
-                result['Items'].append(
-                    Operation._delete(table, subitem['uid'])
-                )
-            return result
+            table.delete_item(Key=dict(uid=uid, parent=parent))
+        result = []
+        for item in all_items(ScanBy.parent, {'parent': uid}, table):
+            result += [cls._del(table, uid=item['uid'], parent=item['parent'])]
+        return dict(uid=uid, parent=parent, Items=result)
 
 
 class Handle:
