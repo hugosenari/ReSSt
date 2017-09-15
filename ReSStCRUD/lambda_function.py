@@ -154,6 +154,7 @@ class Operation(Subscriptable):
     DELETE = lambda x, T: Operation._del(T, x.get('uid'))
     GET =    lambda x, T: ScanBy.get_by(**x)(x, T)
     PUT =    lambda x, T: Operation._update(table=T, **x)
+    PATCH =  lambda x, T: Operation._read(table=T, **x)
     POST =   lambda x, T: T.put_item(
         Item=dict(
             parent=x.pop('parent', ROOT),
@@ -195,13 +196,16 @@ class Operation(Subscriptable):
         cls._do_update(uid=uid, parentUid=parentUid, uids=uids, **data)
 
     @classmethod
-    def _read(cls, uid=None, parentUid=None, uids=set(), **data):
-    upEx = '''REMOVE unread_since,
+    def _read(cls, uid=None, parentUid=None, uids=set(), unread=None, **data):
+    readUpEx = '''REMOVE unread_since,
               SET readed_at = if_not_exists(readed_at, :_now)'''
+    unreadUpEx = '''REMOVE readed_at,
+              SET unread_since = if_not_exists(unread_since, :_now)'''
+    upEx = unreadUpEx if unread else readUpEx
     values = {':_now': now()}
     def method(uid)
-        r = table.update_item(
-            Key={ 'uid': uid }, ExpressionAttributeValues=values,
+        r = table.update_item(Key={ 'uid': uid },
+            ExpressionAttributeValues=values,
             UpdateExpression=upEx)
     return ids
 

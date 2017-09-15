@@ -77,11 +77,19 @@ CRUD operations for sources/items
   Expects json with category, feed or item in body.
 
 - POST  
-  Ipdate source/item.
+  Update item category, feed or item.
   Expects json with category, feed or item in body with on of:
   - uid: uid of item to update;
   - parentUid: uid of parent to update items;
   - uids: list of uid to update.
+
+- PATCH  
+  Set item category, feed or item as read.
+  Expects json with one of:
+  - uid: uid of item to update;
+  - parentUid: uid of parent to update items;
+  - uids: list of uid to update;
+  - unread: set to unread.
 
 - DELETE  
   Delete source or item.
