@@ -25,7 +25,10 @@ def _serializer(obj):
 resp = lambda body, code='200': {
     'statusCode': code,
     'body': json.dumps(body, default=serializer),
-    'headers': {'Content-Type': 'application/json'},
+    'headers': {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+    }
 }
 
 err2body = lambda err: {
@@ -64,7 +67,7 @@ class By(Subscriptable):
     unread  = lambda x: By._day(x, Attr('unread_since').exists())
     read    = lambda x: By._day(x, Attr('readed_at').exists())
     star    = lambda x: By._day(x, Attr('stared').exists())
-    parent  = lambda x: By._un_day(x, Attr('parent').eq(x.get('parent', ROOT)))
+    parent  = lambda x: By._un_day(x, Attr('parent').eq(x.get('parent') or ROOT))
     title   = lambda x: By._un_day(x, Attr('title').contains(x['title']))
     link    = lambda x: By._un_day(x, Attr('link').eq(x['link']))
     text    = lambda x: By._un_day(x, Attr('text').contains(x['text']))
@@ -79,6 +82,10 @@ def params(x, filex=None, key=None, last=None):
     if last:
         result['ExclusiveStartKey'] = last
     if key:
+        if key == 'parent' and not x.get(key):
+            x[key] = ROOT
+        if not x.get(key):
+            raise ValueError('missing parameter "{}"'.format(key))
         result['KeyConditionExpression'] = By.key(x, key)
     if filex:
         result['FilterExpression'] = filex
@@ -94,7 +101,7 @@ def params(x, filex=None, key=None, last=None):
 class ScanBy(Subscriptable):
     parent = lambda x, T: T.query(**params(x, key='parent'))
     uid    = lambda x, T: T.query(**params(x, key='uid'))
-    tree   = lambda x, T: ScanBy._tree(x.get('tree', ROOT), T)
+    tree   = lambda x, T: ScanBy._tree(x.get('tree') or ROOT, T)
     DEFAULT = parent
 
     @classmethod
@@ -105,10 +112,12 @@ class ScanBy(Subscriptable):
         return attr or scan
 
     @classmethod
-    def _tree(cls, parent=ROOT, table=None):
+    def _tree(cls, parent=ROOT, table=None, current_depth=0, max_depth=1):
         result = ScanBy.parent({'parent': parent or ROOT}, table)
-        for item in result['Items']:
-            item['Items'] = cls.tree({'tree': item['uid']}, table)['Items']
+        if current_depth < max_depth:
+            for item in result['Items']:
+                item['Items'] = cls._tree(item['uid'], table, 
+                                          current_depth+1, max_depth)['Items']
         return result
 
     @staticmethod
@@ -145,7 +154,7 @@ class Paginator:
 
 def all_items(parent, table):
     if parent:
-        for page in Paginator(ScanBy.parent, {'parent': parent}, table)
+        for page in Paginator(ScanBy.parent, {'parent': parent}, table):
             for item in page['Items']:
                 yield item
 
@@ -154,7 +163,7 @@ class Operation(Subscriptable):
     DELETE = lambda x, T: Operation._del(T, x.get('uid'))
     GET =    lambda x, T: ScanBy.get_by(**x)(x, T)
     PUT =    lambda x, T: Operation._update(table=T, **x)
-    PATCH =  lambda x, T: Operation._read(table=T, **x)
+    PATCH =  lambda x, T: Operation._as_read(table=T, **x)
     POST =   lambda x, T: T.put_item(
         Item=dict(
             parent=x.pop('parent', ROOT),
@@ -168,21 +177,21 @@ class Operation(Subscriptable):
 
 
     @classmethod
-    def _do_ update(cls, method, table=None, uid=None, parentUid=None,
+    def _do_update(cls, method, table=None, uid=None, parentUid=None,
         uids=set(), **data):
         ids = {uid} if uid else set()
         ids += set(uids) if uids else set()
         ids += set(i['uid'] for i in all_items(parentUid, table))
         if not ids:
             raise ValueError('Undefined uid/uids/parentUid')
-        update = cls._update_method(table, **data)
+        cls._update_method(table, **data)
         result = []
         for _id in uids:
             result += [method(_id)]
         return dict(uid=uid, parentUid=parentUid, uids=uids, result=result)
 
     @classmethod
-    def _update(cls, uid=None, parentUid=None, uids=set(), **data):
+    def _update(cls, table=None, uid=None, parentUid=None, uids=set(), **data):
         sets, values = [], {}
         for k, v in data.items():
             placeholder = ':_{}'.format(k)
@@ -193,21 +202,23 @@ class Operation(Subscriptable):
             return table.update_item(Key={ 'uid': uid },
                 ExpressionAttributeValues=values,
                 UpdateExpression=upex)
-        cls._do_update(uid=uid, parentUid=parentUid, uids=uids, **data)
+        return cls._do_update(
+            table=table, uid=uid, parentUid=parentUid, uids=uids, **data)
 
     @classmethod
-    def _read(cls, uid=None, parentUid=None, uids=set(), unread=None, **data):
-    readUpEx = '''REMOVE unread_since,
-              SET readed_at = if_not_exists(readed_at, :_now)'''
-    unreadUpEx = '''REMOVE readed_at,
-              SET unread_since = if_not_exists(unread_since, :_now)'''
-    upEx = unreadUpEx if unread else readUpEx
-    values = {':_now': now()}
-    def method(uid)
-        r = table.update_item(Key={ 'uid': uid },
-            ExpressionAttributeValues=values,
-            UpdateExpression=upEx)
-    return ids
+    def _as_read(cls, table=None, uid=None, parentUid=None, uids=set(), unread=None, **data):
+        readUpEx = '''REMOVE unread_since,
+                  SET readed_at = if_not_exists(readed_at, :_now)'''
+        unreadUpEx = '''REMOVE readed_at,
+                  SET unread_since = if_not_exists(unread_since, :_now)'''
+        upEx = unreadUpEx if unread else readUpEx
+        values = {':_now': now()}
+        def method(uid):
+            return table.update_item(Key={ 'uid': uid },
+                ExpressionAttributeValues=values,
+                UpdateExpression=upEx)
+        return cls._do_update(
+            table=table, uid=uid, parentUid=parentUid, uids=uids, **data)
 
     @classmethod
     def _del(cls, table, uid=None, parent=None):
@@ -230,13 +241,13 @@ class Handle:
     def __init__(self, event):
         self.method = event.get('httpMethod')
         self.params = event.get('queryStringParameters')
-        self.body =   event.get('body')
+        self.body =   event.get('body') or '{}'
         self.operation = Operation.get(self.method)
 
     @property
     def payload(self):
         return self.params or {} if self.method == 'GET' \
-            else json.loads(self.body) or {}
+            else json.loads(self.body)
 
     @property
     def handle(self):

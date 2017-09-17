@@ -37,7 +37,7 @@ const routes = componentNames.map(name => route({ name }))
     ]);
 const router = new VueRouter({ routes });
 router.beforeEach((to, fron, next) => {
-    const token = localStorage.getItem('api_key');
+    const token = localStorage.getItem('api_key') && localStorage.getItem('api_endpoint');
     const path = to.path;
     let newPath = token ? undefined : ROOT;
     newPath = path === ROOT && token ? '/feeds' : newPath;
