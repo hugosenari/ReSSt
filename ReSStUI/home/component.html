@@ -1,0 +1,11 @@
+<md-content>
+    <md-subheader class="md-primary">Auth</md-subheader>
+    <form name="form">
+        <md-input-container>
+            <md-icon>vpn_key</md-icon>
+            <label>API Token</label>
+            <md-input v-model="api_key"></md-input>
+        </md-input-container>
+        <md-button class="md-raised md-primary" v-on:click="onSave(api_key)">Save</md-button>    
+    </form>
+</md-content>

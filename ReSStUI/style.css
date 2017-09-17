@@ -1,0 +1,6 @@
+#app { visibility: hidden; }
+.md-theme-default #app { visibility: visible; }
+
+.main-content {
+  padding: 16px;
+}
