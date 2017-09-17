@@ -1,1 +1,17 @@
-<p>Item!!!!</p>
+<md-content>
+    <a v-bind:href="self.link" target="_blank">
+        <md-subheader class="md-primary">        
+            <h4>{{self.title}}</h4>
+        </md-subheader>
+    </a>
+    <div class="loading" v-if="!self.title">
+        <md-progress md-indeterminate></md-progress>
+    </div>
+    <md-content>
+        <div v-html="self.summary"></div>
+    </md-content>
+
+    <md-content v-for="content in self.content">
+        <div v-html="content"></div>
+    </md-content>
+</md-content>
