@@ -8,8 +8,14 @@
             <span>{{category.title}}</span>
             <md-list-expand >
                 <md-progress md-indeterminate v-if="!category.Items"></md-progress>
-                <md-list v-for="feed in category.Items">
+                <md-list>
                     <md-list-item class="md-inset">
+                        <router-link :to="'feeds/' + category.uid">
+                            {{category.title}} (all above)
+                            <md-icon class="material-icons">arrow_forward</md-icon>
+                        </router-link>
+                    </md-list-item>
+                    <md-list-item class="md-inset"  v-for="feed in category.Items">
                         <router-link :to="'feeds/' + category.uid + '/' + feed.uid">
                             {{feed.title}}
                             <md-icon class="material-icons">arrow_forward</md-icon>
