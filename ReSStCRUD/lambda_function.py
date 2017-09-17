@@ -178,16 +178,18 @@ class Operation(Subscriptable):
 
     @classmethod
     def _do_update(cls, method, table=None, uid=None, parentUid=None,
-        uids=set(), **data):
+        uids=set(), parent=None, **data):
         ids = {uid} if uid else set()
-        ids += set(uids) if uids else set()
-        ids += set(i['uid'] for i in all_items(parentUid, table))
+        ids |= set(uids) if uids else set()
+        ids |= set(i['uid'] for i in all_items(parentUid, table))
         if not ids:
             raise ValueError('Undefined uid/uids/parentUid')
-        cls._update_method(table, **data)
         result = []
-        for _id in uids:
-            result += [method(_id)]
+        for _id in ids:
+            if not parent:
+                me = ScanBy.uid({'uid': uid}, table)['Items']
+                parent = me[0]['parent'] if me else parent
+            result += [method(_id, parent)]
         return dict(uid=uid, parentUid=parentUid, uids=uids, result=result)
 
     @classmethod
@@ -198,27 +200,27 @@ class Operation(Subscriptable):
             sets.append('{} = {}'.format(k), placeholder)
             values[placeholder] = v
         upex = 'SET {}'.format(','.join(sets))
-        def method(uid):
-            return table.update_item(Key={ 'uid': uid },
+        def method(uid, parent):
+            return table.update_item(Key=dict(uid=uid, parent=parent),
                 ExpressionAttributeValues=values,
                 UpdateExpression=upex)
-        return cls._do_update(
-            table=table, uid=uid, parentUid=parentUid, uids=uids, **data)
+        return cls._do_update(method, table=table, uid=uid,
+                              parentUid=parentUid, uids=list(uids), **data)
 
     @classmethod
     def _as_read(cls, table=None, uid=None, parentUid=None, uids=set(), unread=None, **data):
-        readUpEx = '''REMOVE unread_since,
+        readUpEx = '''REMOVE unread_since
                   SET readed_at = if_not_exists(readed_at, :_now)'''
-        unreadUpEx = '''REMOVE readed_at,
+        unreadUpEx = '''REMOVE readed_at
                   SET unread_since = if_not_exists(unread_since, :_now)'''
         upEx = unreadUpEx if unread else readUpEx
         values = {':_now': now()}
-        def method(uid):
-            return table.update_item(Key={ 'uid': uid },
+        def method(uid, parent):
+            return table.update_item(Key=dict(uid=uid, parent=parent),
                 ExpressionAttributeValues=values,
                 UpdateExpression=upEx)
-        return cls._do_update(
-            table=table, uid=uid, parentUid=parentUid, uids=uids, **data)
+        return cls._do_update(method, table=table, uid=uid, 
+                              parentUid=parentUid, uids=uids, **data)
 
     @classmethod
     def _del(cls, table, uid=None, parent=None):

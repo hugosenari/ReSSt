@@ -56,18 +56,21 @@ ReSSt.App = new window.Vue({
         goBack (n=-1) {
             this.$router.go(n);
         },
-        fetchData (params='') {
+        fetchData (params='', method='GET', body=null) {
             const key = localStorage.getItem('api_key');
             const endpoint = localStorage.getItem('api_endpoint');
             const headers = new Headers();
             headers.append('x-api-key', key);
             headers.append('Content-Type', 'application/json');
             const options = {
-                method: 'GET',
+                method: method,
                 headers,
                 mode: 'cors',
                 cache: 'default'
             };
+            if (body) {
+                options.body = JSON.stringify(body);
+            }
             return fetch(endpoint + 'ReSStCRUD?' + params, options)
                 .then(
                     (response) => {
