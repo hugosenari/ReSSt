@@ -49,13 +49,14 @@ ReSSt.App = new window.Vue({
     el: '#app',
     data () {
         return {
-            transitionName: 'fade'
+            transitionName: 'fade',
+            backTo: null
         };
     },
+    created () {
+        this.$on('BackTo', this.setBackTo);
+    },
     methods: {
-        goBack (n=-1) {
-            this.$router.go(n);
-        },
         fetchData (params='', method='GET', body=null) {
             const key = localStorage.getItem('api_key');
             const endpoint = localStorage.getItem('api_endpoint');
@@ -77,6 +78,17 @@ ReSSt.App = new window.Vue({
                         return response.json();
                     }
                 );
+        },
+        getList() { return ReSSt.data.list; },
+        setList(values) {
+          ReSSt.data.list = {};
+          for (const item of values) {
+              ReSSt.data.list[item.uid] = item;
+          }
+          return ReSSt.data.list;
+        },
+        setBackTo(address) {
+            this.backTo = address;
         }
     }
 });

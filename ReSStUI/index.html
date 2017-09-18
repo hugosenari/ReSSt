@@ -10,11 +10,10 @@
     <body>
         <div id="app" class="md-theme-default">
             <md-toolbar class="md-dense">
-                <md-button v-on:click="goBack()" 
+                <md-button v-bind:href="backTo" v-if="backTo" 
                     class="md-icon-button" aria-label="Back">
                     <md-icon>arrow_back</md-icon>
                 </md-button>
-            
                 <h2 class="md-title" style="flex: 1">
                  ReSStUI
                 </h2>

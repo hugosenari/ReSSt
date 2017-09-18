@@ -11,7 +11,9 @@ window.ReSSt.feeds = Promise.resolve({
     watch: { '$route': 'loadCategories' },
     methods: {
         loadCategories () {
-            const load = this.$parent.$options.methods.fetchData;
+            const methods = this.$parent.$options.methods;
+            const load = methods.fetchData;
+            this.$parent.$emit('BackTo', null);
             return load('tree=root')
                 .then(body => {
                     this.categories = body.Items;

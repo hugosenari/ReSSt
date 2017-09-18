@@ -10,7 +10,7 @@
                 <md-progress md-indeterminate v-if="!category.Items"></md-progress>
                 <md-list>
                     <md-list-item class="md-inset">
-                        <router-link :to="'./' + category.uid">
+                        <router-link :to="'/feeds/' + category.uid">
                             {{category.title}} (all above)
                             <md-icon class="material-icons">arrow_forward</md-icon>
                         </router-link>

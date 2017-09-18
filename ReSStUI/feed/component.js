@@ -12,7 +12,10 @@ window.ReSSt.feed = Promise.resolve({
     methods: {
         loadFeeds () {
             const uid = this.$route.params.feed;
-            const load = this.$parent.$options.methods.fetchData;
+            const methods = this.$parent.$options.methods;
+            const load = methods.fetchData;
+            const setList = methods.setList;
+            this.$parent.$emit('BackTo', `#/feeds`);
             load('uid=' + uid).then(body => {
                 const self = body.Items[0];
                 self.Items = this.self.Items;
@@ -21,6 +24,7 @@ window.ReSSt.feed = Promise.resolve({
             return load('tree=' + uid)
                 .then(body => {
                     this.self.Items = body.Items;
+                    setList(this.self.Items);
                     this.loading = false;
                 });
         },

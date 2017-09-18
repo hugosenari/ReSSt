@@ -1,16 +1,22 @@
 <md-content>
-    <a v-bind:href="self.link" target="_blank">
-        <md-subheader class="md-primary">        
-            <h4>{{self.title}}</h4>
-        </md-subheader>
-    </a>
+    <md-bottom-bar md-shift v-if="self.title">
+        <md-bottom-bar-item md-icon="skip_previous" v-if="previous" v-bind:href="previous">Previous</md-bottom-bar-item>
+        <span style="flex: 1"></span>
+        <md-bottom-bar-item md-icon="open_in_browser" v-bind:href="self.link" target="_blank">Open</md-bottom-bar-item>
+        <span style="flex: 1"></span>
+        <md-bottom-bar-item md-icon="share" v-bind:href="share">Share</md-bottom-bar-item>
+        <span style="flex: 1"></span>
+        <md-bottom-bar-item md-icon="skip_next" v-if="next" v-bind:href="next">Next</md-bottom-bar-item>
+    </md-bottom-bar>
+    <md-subheader class="md-primary">
+        <h4>{{self.title}}</h4>
+    </md-subheader>
     <div class="loading" v-if="!self.title">
         <md-progress md-indeterminate></md-progress>
     </div>
     <md-content>
         <div v-html="self.summary"></div>
     </md-content>
-
     <md-content v-for="content in self.content">
         <div v-html="content"></div>
     </md-content>
