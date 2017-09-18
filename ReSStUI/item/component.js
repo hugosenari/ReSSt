@@ -35,7 +35,7 @@ window.ReSSt.item = Promise.resolve({
             }
         },
         setShare (link) {
-            const encoded = encodeURI(link);
+            const encoded = encodeURIComponent(link);
             const params = [
                 'intent:#Intent',
                 'action=android.intent.action.SEND',
