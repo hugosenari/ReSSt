@@ -10,10 +10,13 @@ window.ReSSt.item = Promise.resolve({
             category: "c"
         };
     },
-    created () { this.loadItem(); },
+    created () {
+        this.loadItem();
+        this.$parent.$on('WindowKeyUp', code => this.onNav(code));
+    },
     watch: { '$route': 'loadItem' },
     methods: {
-        loadItem () {
+        loadItem (...args) {
             const uid = this.$route.params.item;
             this.category = this.$route.params.category;
             const methods = this.$parent.$options.methods;
@@ -21,16 +24,14 @@ window.ReSSt.item = Promise.resolve({
             const load = methods.fetchData;
             this.self = list[uid] || {};
             this.setNav(uid, list);
-            this.$parent.$emit('BackTo', `#/feeds/c/${this.self.parent}`);
+            this.$parent.$emit('BackTo', `#/feeds/${this.category}/${this.self.parent}`);
             if(!this.self.loaded){
+                load('', 'PATCH', { uid: uid });
                 return load('uid=' + uid).then(body => {
                     Object.assign(this.self, body.Items[0], {loaded: true});
                     this.setShare(this.self.link);
                     return this.self;
-                }).then(() => {
-                    load('', 'PATCH', { uid: uid })
-                        .then((body)=>{});
-                });                
+                });
             }
         },
         setShare (link) {
@@ -59,6 +60,17 @@ window.ReSSt.item = Promise.resolve({
             } else {
                 this.next = null;
             }
+        },
+        onNav(code) {
+            const LEFT = 37;
+            const RIGHT = 39;
+            if (this.$route.name === 'ReSSt.item'){
+                if(code === LEFT && this.previous) {
+                    this.$parent.$router.push({ path: this.previous.replace('#', '')});
+                } else if (code === RIGHT && this.next) {
+                    this.$parent.$router.push({ path: this.next.replace('#', '')});
+                }
+            }            
         }
     }
 });

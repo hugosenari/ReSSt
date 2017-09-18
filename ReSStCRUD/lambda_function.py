@@ -87,15 +87,23 @@ def params(x, filex=None, key=None, last=None):
         if not x.get(key):
             raise ValueError('missing parameter "{}"'.format(key))
         result['KeyConditionExpression'] = By.key(x, key)
+    if 'parent' in x:
+        if key == 'parent' or not key:
+            result['IndexName'] = PARENT_INDEX
+        else:
+            filex = filex or By.parent(x);
+    if 'xmlUrl' in x or 'feeds' in x:
+        if key == 'xmlUrl' or not key:
+            result['IndexName'] = FEEDS_INDEX
+        else:
+            filex = filex or By.xmlUrl(x);
+    if 'unread' in x:
+        if key == 'unread_since' or not key:
+            result['IndexName'] = UNREAD_INDEX
+        else:
+            filex = filex or By.unread(x);
     if filex:
         result['FilterExpression'] = filex
-    if 'parent' in x and (key == 'parent' or not key):
-        result['IndexName'] = PARENT_INDEX
-    if 'xmlUrl' in x or 'feeds' in x\
-        and (key == 'xmlUrl' or not key):
-        result['IndexName'] = FEEDS_INDEX
-    if 'unread' in x and (key == 'unread_since' or not key):
-        result['IndexName'] = UNREAD_INDEX
     return result
 
 class ScanBy(Subscriptable):

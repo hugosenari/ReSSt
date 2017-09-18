@@ -55,6 +55,11 @@ ReSSt.App = new window.Vue({
     },
     created () {
         this.$on('BackTo', this.setBackTo);
+        window.addEventListener('keyup', event => {
+            if (event.keyCode) { 
+                this.$emit('WindowKeyUp', event.keyCode, event);
+            }
+        });
     },
     methods: {
         fetchData (params='', method='GET', body=null) {
