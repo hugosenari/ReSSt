@@ -1,13 +1,14 @@
 <md-content>
     <md-subheader class="md-primary"><h4>{{self.title}}</h4></md-subheader>
-    <div class="loading" v-if="!self.Items">
+    <div class="loading" v-if="loading">
         <md-progress md-indeterminate></md-progress>
     </div>
     <md-list>
-        <md-list-item v-for="item in self.Items">
+        <md-list-item v-for="item in Items" v-bind:class="{ 'md-primary': item.active }">
             <router-link :to="'./' + self.uid + '/' + item.uid">
                 {{item.title}}
-                <md-icon class="material-icons">arrow_forward</md-icon>
+                <md-icon v-if="item.active" class="material-icons">label_outline</md-icon>
+                <md-icon v-if="!item.active" class="material-icons">arrow_forward</md-icon>
             </router-link>
         </md-list-item>
     </md-list>

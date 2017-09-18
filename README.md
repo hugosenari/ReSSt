@@ -3,32 +3,45 @@ ReSSt
 
 RSS API based on AWS Lambda, Dynamodb, Api Gateway and Python
 
+This aplicatoion uses 3 levels:
 
-Functions:
-----------
+1. Categories (parent = 'root');
+2. Feeds (parent = category id);
+3. Item (parent = feed id);
+
+
+AWS Lambda Functions:
+---------------------
 
 - FeedMeReSSt:  
   CRON that read RSS sources from time to time.
 
-- ReSStCRUD *WIP*:  
+- ReSStCRUD:  
   API for RSS/OPML item.
 
 - ReSStOPMLImport:  
   API to import sources from OPML xml file.
 
-- ReSStUI *TODO*:  
-  User interface.
+
+ReSStUI:
+--------
+
+Static user interface (WIP).
+
+It can be hosted by Github Pages.
+
+https://hugosenari.github.io/ReSSt/ReSStUI/
 
 
-Tables:
--------
+DynamoDB Tables:
+----------------
 
 - ReSSt:  
   uid, parent: RSS items/sources.
 
 
-Index:
-------
+DynamoDB Index:
+---------------
 
 - parent:   
   parent, imported_at: because most of search is parent based.
@@ -99,7 +112,7 @@ CRUD operations for sources/items
 Install:
 --------
 
-Since it does't have cloudformation yet is not easy, install it on aws.
+Since it does't have CloudFormation file yet, is not easy install it on AWS.
 Good look!
 
 - Create three python3 functions:
@@ -107,6 +120,8 @@ Good look!
     - One for cloudwatch (FeedMeReSSt).
 - Create one DynamoDB table (ReSSt).
 - Create three index (parent, feeds, unread).
+- Publish ou api and create a API-KEY.
+- Upload ReSStUI to somewhere.
 
 
 Todo:

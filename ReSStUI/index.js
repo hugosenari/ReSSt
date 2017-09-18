@@ -85,9 +85,10 @@ ReSSt.App = new window.Vue({
                 );
         },
         getList() { return ReSSt.data.list; },
-        setList(values) {
+        setList(values=[]) {
           ReSSt.data.list = {};
           for (const item of values) {
+              item.active = false;
               ReSSt.data.list[item.uid] = item;
           }
           return ReSSt.data.list;

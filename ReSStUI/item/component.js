@@ -64,15 +64,18 @@ window.ReSSt.item = Promise.resolve({
             }
         },
         onNav(code) {
-            const LEFT = 37;
-            const RIGHT = 39;
             if (this.$route.name === 'ReSSt.item'){
+                const LEFT = 37;
+                const RIGHT = 39;
+                const O = 79;
                 if(code === LEFT && this.previous) {
                     this.$parent.$router.push({ path: this.previous.replace('#', '')});
                 } else if (code === RIGHT && this.next) {
                     this.$parent.$router.push({ path: this.next.replace('#', '')});
+                } else if (code === O) {
+                    window.open(this.link, this.uid);
                 }
-            }            
+            }
         }
     }
 });
