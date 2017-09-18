@@ -26,10 +26,10 @@ window.ReSSt.item = Promise.resolve({
             this.setNav(uid, list);
             this.$parent.$emit('BackTo', `#/feeds/${this.category}/${this.self.parent}`);
             if(!this.self.loaded){
-                load('', 'PATCH', { uid: uid });
                 return load('uid=' + uid).then(body => {
-                    Object.assign(this.self, body.Items[0], {loaded: true});
+                    this.self = Object.assign({}, this.self, body.Items[0], {loaded: true});
                     this.setShare(this.self.link);
+                    load('', 'PATCH', { uid: uid });
                     return this.self;
                 });
             }
