@@ -19,17 +19,19 @@ window.ReSSt.item = Promise.resolve({
         loadItem (...args) {
             const uid = this.$route.params.item;
             this.category = this.$route.params.category;
+            this.feed = this.$route.params.feed;
             const methods = this.$parent.$options.methods;
             const list = methods.getList() || {};
             const load = methods.fetchData;
             this.self = list[uid] || {};
             this.setNav(uid, list);
-            this.$parent.$emit('BackTo', `#/feeds/${this.category}/${this.self.parent}`);
+            this.$parent.$emit('BackTo', `#/feeds/${this.category}/${this.feed}`);
             if(!this.self.loaded){
                 return load('uid=' + uid).then(body => {
                     this.self = Object.assign({}, this.self, body.Items[0], {loaded: true});
                     this.setShare(this.self.link);
                     load('', 'PATCH', { uid: uid });
+                    this.$parent.$emit('BackTo', `#/feeds/${this.category}/${this.self.parent}`);
                     return this.self;
                 });
             }
