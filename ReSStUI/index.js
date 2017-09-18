@@ -77,7 +77,7 @@ ReSSt.App = new window.Vue({
             if (body) {
                 options.body = JSON.stringify(body);
             }
-            return fetch(endpoint + 'ReSStCRUD?' + params, options)
+            return fetch(endpoint + '/ReSStCRUD?' + params, options)
                 .then(
                     (response) => {
                         return response.json();
