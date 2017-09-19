@@ -64,6 +64,10 @@ class By(Subscriptable):
     _day    = lambda x, f: f & By.date(x) if 'date' in x else f
     _un_day = lambda x, f: By._unread(x, By._day(x, f))
     key     = lambda x, key: Key(key).eq(x[key])
+    item    = lambda x: Attr('link').exists()
+    feed    = lambda x: Attr('xmlUrl').exists()
+    cat     = lambda x: Attr('link').not_exists() & Attr('xmlUrl').not_exists()
+    n_item  = lambda x: Attr('link').not_exists() 
     unread  = lambda x: By._day(x, Attr('unread_since').exists())
     read    = lambda x: By._day(x, Attr('readed_at').exists())
     star    = lambda x: By._day(x, Attr('stared').exists())
@@ -76,6 +80,7 @@ class By(Subscriptable):
         x.get('date', now()) - A_DAY, x.get('date', now())
     ))
     DEFAULT = parent
+
 
 def params(x, filex=None, key=None, last=None):
     result = { }
@@ -101,7 +106,7 @@ def params(x, filex=None, key=None, last=None):
         if key == 'unread_since' or not key:
             result['IndexName'] = UNREAD_INDEX
         else:
-            filex = filex or By.unread(x);
+            filex = filex or (By.unread(x)| By.n_item(x));
     if filex:
         result['FilterExpression'] = filex
     return result
@@ -109,7 +114,7 @@ def params(x, filex=None, key=None, last=None):
 class ScanBy(Subscriptable):
     parent = lambda x, T: T.query(**params(x, key='parent'))
     uid    = lambda x, T: T.query(**params(x, key='uid'))
-    tree   = lambda x, T: ScanBy._tree(x.get('tree') or ROOT, T)
+    tree   = lambda x, T: ScanBy._tree(table=T, **x)
     DEFAULT = parent
 
     @classmethod
@@ -120,12 +125,15 @@ class ScanBy(Subscriptable):
         return attr or scan
 
     @classmethod
-    def _tree(cls, parent=ROOT, table=None, current_depth=0, max_depth=1):
-        result = ScanBy.parent({'parent': parent or ROOT}, table)
+    def _tree(cls, tree=ROOT, table=None, current_depth=0, max_depth=1, **data):
+        data['parent'] = tree or ROOT
+        result = ScanBy.parent(data, table)
         if current_depth < max_depth:
+            del data['parent']
             for item in result['Items']:
-                item['Items'] = cls._tree(item['uid'], table, 
-                                          current_depth+1, max_depth)['Items']
+                item['Items'] = cls._tree( 
+                    item['uid'], table, current_depth+1, max_depth, **data
+                )['Items']
         return result
 
     @staticmethod
