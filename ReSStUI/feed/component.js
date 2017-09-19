@@ -6,7 +6,8 @@ window.ReSSt.feed = Promise.resolve({
             loading: true,
             self: {},
             current: null,
-            Items: {}
+            Items: {},
+            empty: false
         };
     },
     created () {
@@ -26,9 +27,15 @@ window.ReSSt.feed = Promise.resolve({
             });
             return load(`parent=${uid}&unread=1`)
                 .then(body => {
-                    this.Items = setList(body.Items) || {};
-                    this.current = body.Items[0];
-                    if (this.current) this.current.active = true;
+                    const items = body.Items;
+                    this.current = items[0];
+                    this.Items = setList(items) || {};
+                    if (this.current) {
+                        this.current.active = true;
+                    } else {
+                        this.loading = false;
+                        this.empty = true;
+                    }
                     this.loading = false;
                 });
         },

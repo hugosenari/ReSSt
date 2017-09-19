@@ -8,7 +8,7 @@ Vue.use(VueMaterial);
 Vue.use(VueRouter);
 const ROOT = '/';
 
-const loadComponent = name => () => {
+const loadComponent = name => {
     const tp = fetch(name + '/component.html').then(response => response.text());
     const js = fetch(name + '/component.js').then(responde => responde.text())
         .then(js => { 
@@ -17,10 +17,11 @@ const loadComponent = name => () => {
             const error = new Error("Can't load component " + name); 
             return component || Promise.reject(error); 
         });
-    return Promise.all([tp, js]).then(([template, component]) => {
+    const promise = Promise.all([tp, js]).then(([template, component]) => {
         component.template = template; 
         return component;
     });
+    return () => promise;
 };
 const route = ({name, path}) => ({
     name: 'ReSSt.' + name,
