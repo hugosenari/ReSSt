@@ -21,7 +21,7 @@ window.ReSSt.cat = Promise.resolve({
                 self.Items = this.self.Items;
                 this.self = self;
             });
-            return load('tree=' + uid)
+            return load(`tree=${uid}&unread=1`)
                 .then(body => {
                     this.self.Items = [];
                     this.loading = false;                    
