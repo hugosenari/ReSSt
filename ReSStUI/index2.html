@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width,initial-scale=1,minimal-ui">
+        <meta charset="UTF-8">
+        <title>ReSStUI</title>
+        <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="//unpkg.com/vue-material@0.7.5/dist/vue-material.css">
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div id="app" class="md-theme-default">
+            <md-toolbar class="md-dense">
+                <md-button :href="backTo" v-if="backTo" 
+                    class="md-icon-button" aria-label="Back">
+                    <md-icon>arrow_back</md-icon>
+                </md-button>
+                <h2 class="md-title" style="flex: 1">
+                 ReSStUI
+                </h2>
+                <router-link tag="md-button" to="/settings"
+                    class="md-icon-button" aria-label="Settings">
+                    <md-icon>settings</md-icon>
+                </router-link>
+            </md-toolbar>
+            <div class="main-content">
+                <transition :name="transitionName">
+                    <router-view></router-view>
+                </transition>
+            </div>
+        </div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.1.6/vue.min.js"></script>
+        <script src="//unpkg.com/vue-material@0.7.5/dist/vue-material.js"></script>
+        <script src="//unpkg.com/vue-router@2.7.0/dist/vue-router.min.js"></script>
+        <script src="index.js"></script>
+    </body>
+</html>
