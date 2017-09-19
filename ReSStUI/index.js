@@ -1,12 +1,17 @@
 /*jshint esversion: 6 */
 const ReSSt = { data: {} };
-window.ReSSt = ReSSt;
-const Vue = window.Vue;
-const VueRouter = window.VueRouter;
-const VueMaterial = window.VueMaterial;
-Vue.use(VueMaterial);
-Vue.use(VueRouter);
 const ROOT = '/';
+window.ReSSt = ReSSt;
+const loaded = (name) => new Promise(resolve => {
+    const hasRessource = () => {
+        if (window[name]) {
+            resolve(window[name]);
+        } else {
+            setTimeout(hasRessource, 10);
+        }
+    };
+    hasRessource();
+});
 
 const loadComponent = name => {
     const tp = fetch(name + '/component.html').then(response => response.text());
@@ -36,17 +41,8 @@ const routes = componentNames.map(name => route({ name }))
         route({ name: 'feed', path: '/feeds/:category/:feed'}),
         route({ name: 'item', path: '/feeds/:category/:feed/:item'})
     ]);
-const router = new VueRouter({ routes });
-router.beforeEach((to, fron, next) => {
-    const token = localStorage.getItem('api_key') && localStorage.getItem('api_endpoint');
-    const path = to.path;
-    let newPath = token ? undefined : ROOT;
-    newPath = path === ROOT && token ? '/feeds' : newPath;
-    return newPath !== path ? next(newPath) : next();
-});
-
-ReSSt.App = new window.Vue({
-    router,
+    
+const App = {
     el: '#app',
     data () {
         return {
@@ -98,4 +94,25 @@ ReSSt.App = new window.Vue({
             this.backTo = address;
         }
     }
+};
+
+loaded('Vue').then(Vue => {
+    loaded('VueMaterial').then(VueMaterial => {
+        Vue.use(window.VueMaterial);
+        loaded('VueRouter').then(VueRouter => {
+            Vue.use(VueRouter);
+            const router = new VueRouter({ routes });
+            router.beforeEach((to, fron, next) => {
+                const token = localStorage.getItem('api_key') && localStorage.getItem('api_endpoint');
+                const path = to.path;
+                let newPath = token ? undefined : ROOT;
+                newPath = path === ROOT && token ? '/feeds' : newPath;
+                return newPath !== path ? next(newPath) : next();
+            });
+            return router;
+        }).then(router => {
+            App.router = router; 
+            ReSSt.App = new window.Vue(App);
+        });
+    });
 });
