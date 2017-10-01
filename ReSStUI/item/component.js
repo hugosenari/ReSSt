@@ -28,10 +28,12 @@ window.ReSSt.item = Promise.resolve({
             this.$parent.$emit('BackTo', `#/feeds/${this.category}/${this.feed}`);
             if(!this.self.loaded){
                 return load('uid=' + uid).then(body => {
-                    this.self = Object.assign({}, this.self, body.Items[0], {loaded: true});
-                    this.setShare(this.self.link);
                     load('', 'PATCH', { uid: uid });
-                    this.$parent.$emit('BackTo', `#/feeds/${this.category}/${this.self.parent}`);
+                    if (this.self.uid === body.Items[0].uid) {
+                        this.self = Object.assign({}, this.self, body.Items[0], {loaded: true});
+                        this.setShare(this.self.link);
+                        this.$parent.$emit('BackTo', `#/feeds/${this.category}/${this.self.parent}`);
+                    }
                     return this.self;
                 });
             }

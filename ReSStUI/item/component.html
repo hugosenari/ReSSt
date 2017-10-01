@@ -1,12 +1,12 @@
 <md-content>
-    <md-bottom-bar md-shift v-if="self.title">
+    <md-bottom-bar v-if="self.title">
         <md-bottom-bar-item md-icon="skip_previous" v-if="previous" v-bind:href="previous">Previous</md-bottom-bar-item>
         <span style="flex: 1"></span>
         <md-bottom-bar-item md-icon="open_in_browser" v-bind:href="self.link" target="_blank">Open</md-bottom-bar-item>
         <span style="flex: 1"></span>
         <md-bottom-bar-item md-icon="skip_next" v-if="next" v-bind:href="next">Next</md-bottom-bar-item>
     </md-bottom-bar>
-    <md-subheader class="md-primary">
+    <md-subheader>
         <h4>{{self.title}}</h4>
     </md-subheader>
     <div class="loading" v-if="!self.title">
@@ -18,4 +18,10 @@
     <md-content v-for="content in self.content">
         <div v-html="content"></div>
     </md-content>
+    <md-button class="md-fab md-fab-bottom-left md-clean  md-mini" v-if="previous" v-bind:href="previous">
+      <md-icon>skip_previous</md-icon>
+    </md-button>
+    <md-button class="md-fab md-fab-bottom-right md-clean  md-mini" v-if="next" v-bind:href="next">
+      <md-icon>skip_next</md-icon>
+    </md-button>
 </md-content>
