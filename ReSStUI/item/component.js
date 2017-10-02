@@ -7,7 +7,8 @@ window.ReSSt.item = Promise.resolve({
             share: "",
             previous: null,
             next: null,
-            category: "c"
+            category: "c",
+            feed: '_'
         };
     },
     created () {
@@ -20,6 +21,7 @@ window.ReSSt.item = Promise.resolve({
             const uid = this.$route.params.item;
             this.category = this.$route.params.category;
             this.feed = this.$route.params.feed;
+            this.feed = this.feed !== '_' ? this.feed : '';
             const methods = this.$parent.$options.methods;
             const list = methods.getList() || {};
             const load = methods.fetchData;
@@ -32,7 +34,6 @@ window.ReSSt.item = Promise.resolve({
                     if (this.self.uid === body.Items[0].uid) {
                         this.self = Object.assign({}, this.self, body.Items[0], {loaded: true});
                         this.setShare(this.self.link);
-                        this.$parent.$emit('BackTo', `#/feeds/${this.category}/${this.self.parent}`);
                     }
                     return this.self;
                 });

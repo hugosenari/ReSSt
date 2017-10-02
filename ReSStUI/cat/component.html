@@ -5,7 +5,7 @@
     </div>
     <md-list>
         <md-list-item v-for="item in Items" v-bind:class="{ 'md-primary': item.active }">
-            <router-link :to="'./' + self.uid + '/' + item.parent + '/' + item.uid">
+            <router-link :to="'./' + self.uid + '/_/' + item.uid">
                 {{item.title}}
                 <md-icon v-if="item.active" class="material-icons">label_outline</md-icon>
                 <md-icon v-if="!item.active" class="material-icons">arrow_forward</md-icon>
