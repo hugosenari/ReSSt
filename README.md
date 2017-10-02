@@ -132,3 +132,4 @@ Todo:
 - Convert to servless/chalice;
 - Add suport to multi user;
 - make all this ugly code pretty;
+- push notifications;
