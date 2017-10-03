@@ -1,0 +1,13 @@
+<md-tab id="service" md-label="Service">
+    <md-input-container>
+        <md-icon>http</md-icon>
+        <label>API Endpoint</label>
+        <md-input v-model="api_endpoint"></md-input>
+    </md-input-container>
+    <md-input-container>
+        <md-icon>vpn_key</md-icon>
+        <label>API Token</label>
+        <md-input v-model="api_key"></md-input>
+    </md-input-container>
+    <md-switch v-model="show_readed" id="show_readed" name="show_readed">Show Readed Items</md-switch>
+</md-tab>

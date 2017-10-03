@@ -55,7 +55,7 @@ window.ReSSt.item = Promise.resolve({
             const uidIndex = keys.indexOf(uid);
             const prev = keys[uidIndex - 1];
             if (prev) {
-                this.previous = prev &&`#/feeds/${this.category}/${this.self.parent}/${prev}`; 
+                this.previous = prev && `#/feeds/${this.category}/${this.self.parent}/${prev}`; 
             } else {
                 this.previous = null;
             }

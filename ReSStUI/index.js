@@ -13,21 +13,23 @@ const loaded = (name) => new Promise(resolve => {
     hasRessource();
 });
 
-const loadComponent = name => {
-    const tp = fetch(name + '/component.html').then(response => response.text());
-    const js = fetch(name + '/component.js').then(responde => responde.text())
-        .then(js => { 
+const loadComponent = (name, path = '', namespace = ReSSt) => {
+    const tp = fetch(`${path}${name}/component.html`).then(response => response.text());
+    const js = fetch(`${path}${name}/component.js`).then(responde => responde.text())
+        .then(js => {
             eval(js);
-            const component = ReSSt[name];
-            const error = new Error("Can't load component " + name); 
-            return component || Promise.reject(error); 
+            const component = namespace[name];
+            const error = new Error("Can't load component " + name);
+            return component || Promise.reject(error);
         });
     const promise = Promise.all([tp, js]).then(([template, component]) => {
-        component.template = template; 
+        component.template = template;
         return component;
     });
     return () => promise;
 };
+window.ReSSt.loadComponent = loadComponent;
+
 const route = ({name, path}) => ({
     name: 'ReSSt.' + name,
     path: path || '/' + name,
@@ -41,7 +43,7 @@ const routes = componentNames.map(name => route({ name }))
         route({ name: 'feed', path: '/feeds/:category/:feed'}),
         route({ name: 'item', path: '/feeds/:category/:feed/:item'})
     ]);
-    
+
 const App = {
     el: '#app',
     data () {
@@ -53,7 +55,7 @@ const App = {
     created () {
         this.$on('BackTo', this.setBackTo);
         window.addEventListener('keyup', event => {
-            if (event.keyCode) { 
+            if (event.keyCode) {
                 this.$emit('WindowKeyUp', event.keyCode, event);
             }
         });
@@ -75,11 +77,11 @@ const App = {
                 options.body = JSON.stringify(body);
             }
             return fetch(endpoint + '/ReSStCRUD?' + params, options)
-                .then(
-                    (response) => {
-                        return response.json();
-                    }
-                );
+            .then(
+                (response) => {
+                    return response.json();
+                }
+            );
         },
         getList() { return ReSSt.data.list; },
         setList(values=[]) {
@@ -111,7 +113,7 @@ loaded('Vue').then(Vue => {
             });
             return router;
         }).then(router => {
-            App.router = router; 
+            App.router = router;
             ReSSt.App = new window.Vue(App);
         });
     });

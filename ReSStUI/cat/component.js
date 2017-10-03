@@ -25,7 +25,9 @@ window.ReSSt.cat = Promise.resolve({
             load('uid=' + uid).then(body => {
                 this.self = body.Items[0];
             });
-            return load(`tree=${uid}&unread=1`)
+            const show_readed = localStorage.getItem('show_readed');
+            const unread = show_readed === 'true' ? '' : '&unread=1'; 
+            return load(`parent=${uid}${unread}`)
                 .then(body => {
                     let items = [];
                     for (const item of body.Items) {
