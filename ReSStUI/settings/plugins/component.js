@@ -12,7 +12,6 @@ window.ReSSt.settings.plugins = Promise.resolve({
         const app = window.ReSSt.App;
         app.$on('LoadPlugin', this.updatePluginList);
         app.$on('RemovePlugin', this.updatePluginList);
-        app.$on('PluginReady', this.updatePluginList);
         app.$on('PluginEnabled', this.updatePluginList);
         app.$on('PluginDisabled', this.updatePluginList);
         this.updatePluginList();
@@ -20,9 +19,7 @@ window.ReSSt.settings.plugins = Promise.resolve({
     watch: {},
     methods: {
         updatePluginList() {
-            const app = window.ReSSt.App;
-            const methods = app.$options.methods;
-            this.plugins = methods.getPlugins();
+            this.plugins = JSON.parse(localStorage.getItem('plugins') || '{}');
         },
         loadPlugin(plugin_name, plugin_address) {
             const app = window.ReSSt.App;

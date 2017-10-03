@@ -4,3 +4,6 @@
 .main-content {
   padding: 16px;
 }
+
+:focus { outline: none; }
+::-moz-focus-inner { border: 0; }

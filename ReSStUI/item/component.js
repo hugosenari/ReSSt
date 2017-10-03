@@ -35,6 +35,8 @@ window.ReSSt.item = Promise.resolve({
                         this.self = Object.assign({}, this.self, body.Items[0], {loaded: true});
                         this.setShare(this.self.link);
                     }
+                    this.$parent.$emit('BeforeShowItem', this.self);
+                    this.self = this.self;
                     return this.self;
                 });
             }

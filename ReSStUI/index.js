@@ -48,20 +48,21 @@ const App = {
     el: '#app',
     data () {
         return {
-            plugins: {},
             transitionName: 'fade',
             backTo: null
         };
     },
     created () {
         this.$on('BackTo', this.setBackTo);
-        this.loadPlugins();
         window.addEventListener('keyup', event => {
             if (event.keyCode) {
                 this.$emit('WindowKeyUp', event.keyCode, event);
             }
         });
     },
+    components: {
+        'resstplugins':  window.ReSSt.loadComponent('plugins')
+    } ,
     methods: {
         fetchData (params='', method='GET', body=null) {
             const key = localStorage.getItem('api_key');
@@ -96,73 +97,6 @@ const App = {
         },
         setBackTo(address) {
             this.backTo = address;
-        },
-        getPlugins() {
-            return JSON.parse(localStorage.getItem('plugins') || '{}');
-        },
-        setPlugins(plugins) {
-            localStorage.setItem('plugins', JSON.stringify(plugins));
-            this.plugins = plugins;
-            return plugins;
-        },
-        setPlugin(name, plugin) {
-            const plugins = this.getPlugins();
-            plugins[name] = plugin;
-            return this.setPlugins(plugins);
-        },
-        removePlugin(name) {
-            this.$emit('PluginDisabled', name);
-            const plugins = this.getPlugins();
-            delete plugins[name];
-            return this.setPlugins(plugins);
-        },
-        getPlugin(name) {
-            return this.getPlugins()[name];
-        },
-        setPluginState(name, state) {
-            const plugin = this.getPlugin(name);
-            plugin.state = state;
-            return this.setPlugin(name, plugin);
-        },
-        loadPlugin(name, address) {
-            const state = false;
-            const newPlugin = { address,  state, name };
-            const plugin = this.getPlugin(name) || newPlugin;
-            return this.setPlugin(name, plugin);
-        },
-        unloadPlugin(name) {
-            return this.removePlugin(name);
-        },
-        pluginReady(name) {
-            if (this._plugins.includes(name)) {
-                this.$emit('PluginEnabled', name);
-            }
-            return this.setPluginState(name, true);
-        },
-        pluginEnabled(name) {
-            if (!this._plugins.includes(name)) {
-                this._plugins = [name].concat(this._plugins);
-            }
-            return this.setPluginState(name, true);
-        },
-        pluginDisabled(name) {
-            this._plugins = this._plugins.filter(i => i !== name);
-            return this.setPluginState(name, false);
-        },
-        loadPlugins() {
-            this.$on('LoadPlugin', this.loadPlugin);
-            this.$on('RemovePlugin', this.removePlugin);
-            this.$on('PluginReady', this.pluginReady);
-            this.$on('PluginEnabled', this.pluginEnabled);
-            this.$on('PluginDisabled', this.pluginDisabled);
-            this._plugins = [];
-            const plugins = this.getPlugins();
-            for (const name of Object.keys(plugins)) {
-                if (plugins[name].state) {
-                    this._plugins = [name].concat(this._plugins);
-                }
-            }
-            return this.setPlugins(plugins);
         }
     }
 };
