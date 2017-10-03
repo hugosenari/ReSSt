@@ -49,7 +49,6 @@ const App = {
     data () {
         return {
             plugins: {},
-            _plugins: [],
             transitionName: 'fade',
             backTo: null
         };
@@ -126,8 +125,7 @@ const App = {
             return this.setPlugin(name, plugin);
         },
         loadPlugin(name, address) {
-            // possible states -1 pre load, 0 disabled, 1 enabled
-            const state = -1;
+            const state = false;
             const newPlugin = { address,  state, name };
             const plugin = this.getPlugin(name) || newPlugin;
             return this.setPlugin(name, plugin);
@@ -139,17 +137,17 @@ const App = {
             if (this._plugins.includes(name)) {
                 this.$emit('PluginEnabled', name);
             }
-            return this.setPluginState(name, 0);
+            return this.setPluginState(name, true);
         },
         pluginEnabled(name) {
             if (!this._plugins.includes(name)) {
-                this._plugins = [name].join(this._plugins);
+                this._plugins = [name].concat(this._plugins);
             }
-            return this.setPluginState(name, 1);
+            return this.setPluginState(name, true);
         },
         pluginDisabled(name) {
             this._plugins = this._plugins.filter(i => i !== name);
-            return this.setPluginState(name, 0);
+            return this.setPluginState(name, false);
         },
         loadPlugins() {
             this.$on('LoadPlugin', this.loadPlugin);
@@ -157,10 +155,11 @@ const App = {
             this.$on('PluginReady', this.pluginReady);
             this.$on('PluginEnabled', this.pluginEnabled);
             this.$on('PluginDisabled', this.pluginDisabled);
+            this._plugins = [];
             const plugins = this.getPlugins();
             for (const name of Object.keys(plugins)) {
-                if (plugins[name].state === 1) {
-                    this._plugins = [name].join(this._plugins);
+                if (plugins[name].state) {
+                    this._plugins = [name].concat(this._plugins);
                 }
             }
             return this.setPlugins(plugins);

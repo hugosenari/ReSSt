@@ -1,23 +1,46 @@
 /*jshint esversion: 6 */
 
-window.ReSSt.settings = Promise.resolve({
+window.ReSSt.settings.plugins = Promise.resolve({
     data () {
         return {
-            api_key: localStorage.getItem('api_key'),
-            api_endpoint: localStorage.getItem('api_endpoint'),
-            show_readed: false 
+            plugin_name: '',
+            plugin_address: '',
+            plugins: {}
         };
     },
-    watch: {
-        api_key: val => localStorage.setItem('api_key', val),
-        api_endpoint: val => localStorage.setItem('api_endpoint', val),
-        show_readed: val => localStorage.setItem('show_readed', val), 
+    created () {
+        this.updatePluginList();
     },
+    watch: {},
     methods: {
-        onSave(api_endpoint, api_key) {
-            localStorage.setItem('api_key', api_key);
-            localStorage.setItem('api_endpoint', api_endpoint);
-            this.$router.push('feeds');
+        loadPlugin(plugin_name, plugin_address) {
+            const app = window.ReSSt.App;
+            app.$emit('LoadPlugin', plugin_name, plugin_address);
+            app.$on('LoadPlugin', this.updatePluginList);
+            app.$on('RemovePlugin', this.updatePluginList);
+            app.$on('PluginReady', this.updatePluginList);
+            app.$on('PluginEnabled', this.updatePluginList);
+            app.$on('PluginDisabled', this.updatePluginList);
+            this.updatePluginList();
+        },
+        unloadPlugin(name) {
+            const app = window.ReSSt.App;
+            app.$emit('RemovePlugin', name);
+            this.updatePluginList();
+        },
+        changePluginState(name, state) {
+            const app = window.ReSSt.App;
+            if (state) {
+                app.$emit('PluginEnabled', name);
+            } else {
+                app.$emit('PluginDisabled', name);
+            }
+            this.updatePluginList();
+        },
+        updatePluginList() {
+            const app = window.ReSSt.App;
+            const methods = app.$options.methods;
+            this.plugins = methods.getPlugins();
         }
     }   
 });
