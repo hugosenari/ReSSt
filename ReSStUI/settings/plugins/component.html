@@ -10,15 +10,24 @@
         <md-input v-model="plugin_address"></md-input>
     </md-input-container>
     <md-button class="md-raised md-primary" @click="loadPlugin(plugin_name, plugin_address)">Add</md-button>
-    <h4>Current Plugins:</h4>
+    <h4>Installed Plugins:</h4>
     <md-list>
         <md-list-item v-for="(plugin, name) in plugins">
             <md-switch :name="name" v-model="plugin.state" @change="changePluginState(name, !plugin.state)">
-                {{name}}
+                {{name}} {{plugin.state}}
             </md-switch>
             <md-button class="md-icon-button md-raised md-dense" @click="unloadPlugin(name)">
                 <md-icon>remove</md-icon>
-            </md-button>                  
+            </md-button>
+        </md-list-item>
+    </md-list>
+    <h4>Know Plugins:</h4>
+    <md-list>
+        <md-list-item v-for="plugin in know_plugns">
+            {{plugin.name}}
+            <md-button class="md-icon-button md-raised md-dense" @click="loadPlugin(plugin.name, plugin.address)" v-if="!plugins[plugin.name]">
+                <md-icon>add</md-icon>
+            </md-button>
         </md-list-item>
     </md-list>
 </md-tab>

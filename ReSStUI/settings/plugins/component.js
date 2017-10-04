@@ -5,7 +5,12 @@ window.ReSSt.settings.plugins = Promise.resolve({
         return {
             plugin_name: '',
             plugin_address: '',
-            plugins: {}
+            plugins: {},
+            know_plugns: [
+                { name: 'blank', address: './plugins/blank.js'},
+                { name: 'gfycat', address: './plugins/gfycat.js'},
+                { name: 'imgurian', address: './plugins/imgurian.js'}
+            ],
         };
     },
     created () {
