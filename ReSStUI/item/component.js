@@ -8,14 +8,17 @@ window.ReSSt.item = Promise.resolve({
             previous: null,
             next: null,
             category: "c",
-            feed: '_'
+            feed: '_',
+            embedders: {}
         };
     },
     created () {
         this.loadItem();
         this.$parent.$on('WindowKeyUp', code => this.onNav(code));
     },
-    watch: { '$route': 'loadItem' },
+    watch: {
+        '$route': 'loadItem'
+    },
     methods: {
         loadItem (...args) {
             const uid = this.$route.params.item;

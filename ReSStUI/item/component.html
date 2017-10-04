@@ -16,8 +16,14 @@
         <md-content>
             <div v-html="self.summary"></div>
         </md-content>
+        <template v-for="(child, name) in embedders">
+            <component :is="child" :key="child.name" :text="content"></component>
+        </template>
         <md-content v-for="content in self.content">
             <div v-html="content"></div>
+            <template v-for="(child, name) in embedders">
+                <component :is="child" :key="child.name" :text="content"></component>
+            </template>
         </md-content>
     </div>
     <md-button class="md-fab md-fab-bottom-left md-clean  md-mini" v-if="previous" v-bind:href="previous">
