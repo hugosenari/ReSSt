@@ -6,7 +6,8 @@
     const name = 'gfycat';
     const getBtn = path => {
         var id = path.replace(/.+gfycat\.com\/([^.#?]+)\.*.*/, '$1');
-        return !id ? '':`<div class="gfyitem" data-title=true data-autoplay=true data-controls=true data-id="${id} data-responsive=true">
+        return !id ? '':`<div class="gfyitem" data-title=true data-autoplay=true
+    data-controls=true data-id="${id}" data-responsive=true data-hd=false>
     <md-button class="md-fab md-mini md-raised" title="show this"
         onclick="(() => {window.gfyCollection.init();})();">
         <i class="material-icons" style="font-size:44px;">play_circle_outline</i>

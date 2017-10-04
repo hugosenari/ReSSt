@@ -25,7 +25,7 @@ window.ReSSt.item = Promise.resolve({
             const methods = this.$parent.$options.methods;
             const list = methods.getList() || {};
             const load = methods.fetchData;
-            this.self = list[uid] || {};
+            this.self = list[uid] || { uid };
             this.setNav(uid, list);
             this.$parent.$emit('BackTo', `#/feeds/${this.category}/${this.feed}`);
             if(!this.self.loaded){
