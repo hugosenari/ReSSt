@@ -9,7 +9,8 @@ window.ReSSt.settings.plugins = Promise.resolve({
             know_plugns: [
                 { name: 'blank', address: './plugins/blank.js'},
                 { name: 'gfycat', address: './plugins/gfycat.js'},
-                { name: 'imgurian', address: './plugins/imgurian.js'}
+                { name: 'imgurian', address: './plugins/imgurian.js'},
+                { name: 'giphy', address: './plugins/giphy.js'}
             ],
         };
     },
