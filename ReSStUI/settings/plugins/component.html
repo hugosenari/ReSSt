@@ -14,7 +14,7 @@
     <md-list>
         <md-list-item v-for="(plugin, name) in plugins">
             <md-switch :name="name" v-model="plugin.state" @change="changePluginState(name, !plugin.state)">
-                {{name}} {{plugin.state}}
+                {{name}}
             </md-switch>
             <md-button class="md-icon-button md-raised md-dense" @click="unloadPlugin(name)">
                 <md-icon>remove</md-icon>
@@ -23,9 +23,9 @@
     </md-list>
     <h4>Know Plugins:</h4>
     <md-list>
-        <md-list-item v-for="plugin in know_plugns">
+        <md-list-item v-for="plugin in know_plugns" v-if="!plugins[plugin.name]">
             {{plugin.name}}
-            <md-button class="md-icon-button md-raised md-dense" @click="loadPlugin(plugin.name, plugin.address)" v-if="!plugins[plugin.name]">
+            <md-button class="md-icon-button md-raised md-dense" @click="loadPlugin(plugin.name, plugin.address)">
                 <md-icon>add</md-icon>
             </md-button>
         </md-list-item>
