@@ -60,7 +60,6 @@ window.ReSSt.plugin = Promise.resolve({
             if (this._plugins.includes(name)) {
                 app.$emit('PluginEnabled', name);
             }
-            return this.setPluginState(name, true);
         },
         pluginEnabled(name) {
             if (!this._plugins.includes(name)) {
