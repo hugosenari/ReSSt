@@ -1,6 +1,6 @@
 /*jshint esversion: 6 */
 
-window.ReSSt.plugins = Promise.resolve({
+window.ReSSt.plugin = Promise.resolve({
     created () {
         new Promise(resolve => resolve(this.loadPlugins()));
     },

@@ -37,6 +37,7 @@ window.ReSSt.item = Promise.resolve({
                     }
                     this.$parent.$emit('BeforeShowItem', this.self);
                     this.self = this.self;
+                    this.$parent.$emit('ItemLoaded', this.self);
                     return this.self;
                 });
             }

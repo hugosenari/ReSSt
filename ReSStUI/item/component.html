@@ -12,12 +12,14 @@
     <div class="loading" v-if="!self.title">
         <md-progress md-indeterminate></md-progress>
     </div>
-    <md-content>
-        <div v-html="self.summary"></div>
-    </md-content>
-    <md-content v-for="content in self.content">
-        <div v-html="content"></div>
-    </md-content>
+    <div class="article-content">
+        <md-content>
+            <div v-html="self.summary"></div>
+        </md-content>
+        <md-content v-for="content in self.content">
+            <div v-html="content"></div>
+        </md-content>
+    </div>
     <md-button class="md-fab md-fab-bottom-left md-clean  md-mini" v-if="previous" v-bind:href="previous">
       <md-icon>skip_previous</md-icon>
     </md-button>

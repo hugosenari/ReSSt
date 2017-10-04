@@ -61,7 +61,7 @@ const App = {
         });
     },
     components: {
-        'resstplugins':  window.ReSSt.loadComponent('plugins')
+        'resstplugins':  window.ReSSt.loadComponent('plugin')
     } ,
     methods: {
         fetchData (params='', method='GET', body=null) {
