@@ -1,19 +1,17 @@
 /*jshint esversion: 6 */
 
 (() => {
-    let enabled = false;
-    const app = window.ReSSt.App;
-    const name = 'gfycat';
-    const getBtn = path => {
-        var id = path.replace(/.+gfycat\.com\/([^.#?]+)\.*.*/, '$1');
-        return !id ? '':`<div class="gfyitem" data-title=true data-autoplay=true
-    data-controls=true data-id="${id}" data-responsive=true data-hd=false>
-    <md-button class="md-fab md-mini md-raised" title="show this"
-        onclick="(() => {window.gfyCollection.init();})();">
-        <i class="material-icons" style="font-size:44px;">play_circle_outline</i>
-    </md-button>
+    const name = 'gfycat'
+    const template = `<div><md-content v-for="url in urls"><plugin-${name}-embed :uri="url"></plugin-${name}-embed></md-content></div>`;
+    const buttonTemplate = `<div>
+        <md-button class="md-icon-button md-raised" title="show this" @click="show = true"  v-if="!show">
+            <md-icon>play_arrow</md-icon>
+        </md-button>
+        <div v-if="show" style="position:relative;padding-bottom:182%">
+            <iframe :src="'https://gfycat.com/ifr/' + imageId" frameborder="0" scrolling="no" style="position:absolute;top:0;left:0;height:20%;" allowfullscreen></iframe>
+        </div>
 </div>`;
-    };
+    const getUrlId = path => path && path.replace(/.+gfycat\.com\/([^.#?]+)\.*.*/, '$1');
     const getUrls = content => {
         const urls = [];
         if (content) {
@@ -29,33 +27,28 @@
         }
         return urls;
     };
-    app.$on('PluginEnabled', n => {
-        if (n === name) {
-            enabled = true;
-            (function(d, s, id){
-                var js, fjs = d.getElementsByTagName(s)[0];
-                if (d.getElementById(id)) {return;}
-                js = d.createElement(s); js.id = id;
-                js.src = "https://assets.gfycat.com/gfycat.js";
-                fjs.parentNode.insertBefore(js, fjs);
-            }(document, 'script', 'gfycat-js'));
-        }
-    });
-    app.$on('PluginDisabled', n => n === name && (enabled = false));
-    app.$on('BeforeShowItem', item => {
-        if (enabled) {
-            let urls = [];
-            if (item) {
-                urls = urls.concat(getUrls(item.summary));
-                for (const i of item.content.keys()) {
-                    urls = urls.concat(getUrls(item.content[i]));
-                }
-                for (const url of urls) {
-                    item.content.push(getBtn(url));
+    window.ReSSt.plugin.embedComponent({
+        name,
+        component: {
+            name: `plugin-${name}`,
+            template,
+            props: ['text'],
+            created () {
+                this.urls = getUrls(this.text);
+            },
+            data () { return { urls: [] } },
+            watch: { text (val) { this.urls = getUrls(val); } },
+            components: {
+                [`plugin-${name}-embed`]: function() {
+                    return Promise.resolve({
+                        template: buttonTemplate,
+                        props: ['uri'],
+                        data () { return {imageId: null, show: false } },
+                        created () { this.imageId = getUrlId(this.uri); },
+                        watch: { uri (val) { this.imageId = getUrlId(val); } }
+                    });
                 }
             }
         }
-        return item;
     });
-    app.$emit('PluginReady', name);
 })();
