@@ -6,12 +6,10 @@
     const buttonTemplate = `<div><md-button class="md-icon-button md-raised" title="show this" @click="show = true" v-if="!show">
         <md-icon>play_arrow</md-icon>
     </md-button>
-    <md-layout md-flex="true" v-if="show">
-        <p><a :href="'https://${name}.com/gifs/' + imageId" target="_blank" style="display: block; position: absolute">via GIPHY</a></p>
-        <div style="position:relative;padding-bottom:35%">
-            <iframe :src="'https://${name}.com/embed/' + imageId" frameBorder="0" allowFullScreen style="position:absolute;top:0;left:0;height:100%;"></iframe>
-        </div>
-    </md-layout>
+    <div v-if="show" style="position:relative;padding-bottom:35%; width: 100%">
+        <iframe :src="'https://${name}.com/embed/' + imageId"
+        frameBorder="0" allowFullScreen style="position:absolute;top:0;left:0;height:100%; width: 100%"></iframe>
+    </div>
 </div>`;
     const getUrlId = path => path && path.replace(/.+giphy\.com\/(media|gifs)\/([^.#?\/]+)\.*.*/, '$2');
     const getUrls = content => {

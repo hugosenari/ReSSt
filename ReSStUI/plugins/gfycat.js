@@ -7,8 +7,9 @@
         <md-button class="md-icon-button md-raised" title="show this" @click="show = true"  v-if="!show">
             <md-icon>play_arrow</md-icon>
         </md-button>
-        <div v-if="show" style="position:relative;padding-bottom:35%">
-            <iframe :src="'https://gfycat.com/ifr/' + imageId" frameborder="0" scrolling="no" style="position:absolute;top:0;left:0;height:100%;" allowfullscreen></iframe>
+        <div v-if="show" style="position:relative;padding-bottom:35%; width: 100%">
+            <iframe :src="'https://gfycat.com/ifr/' + imageId"
+            frameBorder="0" allowFullScreen style="position:absolute;top:0;left:0;height:100%; width: 100%"></iframe>
         </div>
 </div>`;
     const getUrlId = path => path && path.replace(/.+gfycat\.com\/([^.#?]+)\.*.*/, '$1');
