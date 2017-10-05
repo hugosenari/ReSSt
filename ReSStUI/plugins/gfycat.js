@@ -12,7 +12,7 @@
         :src="'https://gfycat.com/ifr/' + imageId"></iframe>
     </div>
 </div>`;
-    const getUrlId = path => path && path.replace(/.+gfycat\.com\/([^.#?]+)\.*.*/, '$1');
+    const getUrlId = path => path && path.replace(/.+gfycat\.com\/([^.#?-]+)\.*.*/, '$1');
     const getUrls = content => {
         const urls = [];
         if (content) {
