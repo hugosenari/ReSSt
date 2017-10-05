@@ -32,11 +32,9 @@
             name: 'plugin-giphy',
             template,
             props: ['text'],
-            created () {
-                this.urls = getUrls(this.text);
-            },
+            created () { this.urls = getUrls(this.text); },
             data () { return { urls: [] } },
-            watch: {text (val) { this.urls = getUrls(val); }},
+            watch: { text (val) { this.urls = getUrls(val); } },
             components: {
                 'plugin-giphy-embed': function() {
                     return Promise.resolve({
