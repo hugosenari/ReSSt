@@ -89,3 +89,30 @@ window.ReSSt.plugin = Promise.resolve({
         }
     }
 });
+
+window.ReSSt.plugin.embedComponent = opts => {
+    let enabled = false;
+    let itemVue = null;
+    const Vue = window.Vue;
+    const app = window.ReSSt.App;
+    const name = opts.name;
+    const component = opts.component;
+    Vue.component(`plugin-${name}`, component);
+    app.$on('PluginEnabled', n => {
+        if (n === name) {
+            enabled = true;
+            itemVue && itemVue.$emit('RegisterEmbeder', component);
+        }
+    });
+    app.$on('PluginDisabled', n => {
+        if (n === name) {
+            enabled = false;
+            itemVue && itemVue.$emit('UnregisterEmbeder', component);
+        }
+    });
+    app.$on('ItemView', vue => {
+        itemVue = vue;
+        enabled && itemVue.$emit('RegisterEmbeder', component);
+    });
+    app.$emit('PluginReady', name);
+};

@@ -9,12 +9,14 @@ window.ReSSt.item = Promise.resolve({
             next: null,
             category: "c",
             feed: '_',
-            embedders: {}
+            embedders: []
         };
     },
     created () {
-        this.loadItem();
         this.$parent.$on('WindowKeyUp', code => this.onNav(code));
+        this.$on('RegisterEmbeder', this.registerEmbeder);
+        this.$on('UnregisterEmbeder', this.unregisterEmbeder);
+        this.loadItem();
     },
     watch: {
         '$route': 'loadItem'
@@ -40,7 +42,7 @@ window.ReSSt.item = Promise.resolve({
                     }
                     this.$parent.$emit('BeforeShowItem', this.self);
                     this.self = this.self;
-                    this.$parent.$emit('ItemLoaded', this.self);
+                    this.$parent.$emit('ItemView', this);
                     return this.self;
                 });
             }
@@ -85,6 +87,14 @@ window.ReSSt.item = Promise.resolve({
                     window.open(this.link, this.uid);
                 }
             }
+        },
+        registerEmbeder (embeder) {
+            if (this.embedders.every(component => component.name !== embeder.name)){
+                this.embedders.push(embeder);
+            }
+        },
+        unregisterEmbeder (embeder) {
+            this.embedders = this.embedders.filter(component => component.name !== embeder.name);
         }
     }
 });

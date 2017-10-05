@@ -16,12 +16,12 @@
         <md-content>
             <div v-html="self.summary"></div>
         </md-content>
-        <template v-for="(child, name) in embedders">
-            <component :is="child" :key="child.name" :text="content"></component>
+        <template v-for="(child, index) in embedders">
+            <component :is="child" :key="child.name" :text="self.summary"></component>
         </template>
         <md-content v-for="content in self.content">
             <div v-html="content"></div>
-            <template v-for="(child, name) in embedders">
+            <template v-for="(child, index) in embedders">
                 <component :is="child" :key="child.name" :text="content"></component>
             </template>
         </md-content>
