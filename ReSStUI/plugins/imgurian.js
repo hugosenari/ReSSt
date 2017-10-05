@@ -7,7 +7,7 @@
         <md-button class="md-icon-button md-raised" title="show this" @click="show = true"  v-if="!show">
             <md-icon>play_arrow</md-icon>
         </md-button>
-        <div v-if="show" style="position:relative;padding-bottom:35%; width: 100%">
+        <div v-if="show" style="position:relative;padding-bottom:55%; width: 100%">
             <iframe :src="'https://imgur.com/'+ imageId + '/embed'"
             frameBorder="0" allowFullScreen style="position:absolute;top:0;left:0;height:100%; width: 100%"></iframe>
         </div>
