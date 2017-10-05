@@ -3,12 +3,13 @@
 (() => {
     const name = 'giphy'
     const template = `<div><md-content v-for="url in urls"><plugin-${name}-embed :uri="url"></plugin-${name}-embed></md-content></div>`;
-    const buttonTemplate = `<div><md-button class="md-icon-button md-raised" title="show this" @click="show = true" v-if="!show">
+    const buttonTemplate = `<div>
+    <md-button class="md-icon-button md-raised" title="show this" @click="show = true" v-if="!show">
         <md-icon>play_arrow</md-icon>
     </md-button>
-    <div v-if="show" style="position:relative;padding-bottom:55%; width: 100%">
-        <iframe :src="'https://${name}.com/embed/' + imageId"
-        frameBorder="0" allowFullScreen style="position:absolute;top:0;left:0;height:100%; width: 100%"></iframe>
+    <div v-if="show">
+        <iframe frameBorder="0" allowFullScreen
+        :src="'https://${name}.com/embed/' + imageId"></iframe>
     </div>
 </div>`;
     const getUrlId = path => path && path.replace(/.+giphy\.com\/(media|gifs)\/([^.#?\/]+)\.*.*/, '$2');
