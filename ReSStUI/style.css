@@ -1,5 +1,13 @@
+body {
+  min-height: 100%;
+  display: block;
+}
+
 #app {
   visibility: hidden;
+  height: 100%;
+  min-height: 100%;
+  display: block;
 }
 .md-theme-default #app { visibility: visible; }
 
@@ -9,3 +17,16 @@
 
 :focus { outline: none; }
 ::-moz-focus-inner { border: 0; }
+
+.embed-plugin-frame {
+  position: relative;
+  padding-top: 50%;
+}
+
+.embed-plugin .embed-plugin-item .embed-plugin-frame iframe {
+  width: 50%;
+  margin: 0 auto;
+  position: absolute;
+  height: 80%;
+  top: 0;
+}

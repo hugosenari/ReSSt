@@ -2,14 +2,14 @@
 
 (() => {
     const name = 'imgurian'
-    const template = `<div><md-content v-for="url in urls"><plugin-${name}-embed :uri="url"></plugin-${name}-embed></md-content></div>`;
-    const buttonTemplate = `<div>
+    const template = `<div class="embed-plugin"><md-content v-for="url in urls"><plugin-${name}-embed :uri="url"></plugin-${name}-embed></md-content></div>`;
+    const buttonTemplate = `<div class="embed-plugin-item">
     <md-button class="md-icon-button md-raised" title="show this" @click="show = true" v-if="!show">
         <md-icon>play_arrow</md-icon>
     </md-button>
-    <div v-if="show">
+    <div v-if="show" class="embed-plugin-frame">
         <iframe frameBorder="0" allowFullScreen
-        :src="'https://imgur.com/'+ imageId + '/embed'"></iframe>
+        :src="'https://imgur.com/'+ imageId + '/embed?w=240'"></iframe>
     </div>
 </div>`;
     const getUrlId = path => path && path.replace(/.+imgur\.com\/([^.#?]+)\.*.*/, '$1').replace(/gallery\//, '');
