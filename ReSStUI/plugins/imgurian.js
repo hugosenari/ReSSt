@@ -1,19 +1,17 @@
 /*jshint esversion: 6 */
 
 (() => {
-    let enabled = false;
-    const app = window.ReSSt.App;
-    const name = 'imgurian';
-    const getImagurBtn = path => {
-        var id = path.replace(/.+imgur\.com\/([^.#?]+)\.*.*/, '$1');
-        id = id.replace(/gallery\//, '');
-        return !id ? '':`<blockquote class="imgur-embed-pub" lang="en" data-id="${id}" data-context="false">
-    <md-button class="md-fab md-mini md-raised" title="show this"
-        onclick="(() => {const script = document.createElement('script'); script.src = '//s.imgur.com/min/embed.js'; body.appendChild(script);})();">
-        <i class="material-icons" style="font-size:44px;">play_circle_outline</i>
-    </md-button>
-</blockquote>`;
-    };
+    const name = 'imgurian'
+    const template = `<div><md-content v-for="url in urls"><plugin-${name}-embed :uri="url"></plugin-${name}-embed></md-content></div>`;
+    const buttonTemplate = `<div>
+        <md-button class="md-icon-button md-raised" title="show this" @click="show = true"  v-if="!show">
+            <md-icon>play_arrow</md-icon>
+        </md-button>
+        <div v-if="show" style="position:relative;padding-bottom:35%">
+            <iframe :src="'https://imgur.com/'+ imageId + '/embed'" frameborder="0" scrolling="no" style="position:absolute;top:0;left:0;height:100%;" allowfullscreen></iframe>
+        </div>
+</div>`;
+    const getUrlId = path => path && path.replace(/.+imgur\.com\/([^.#?]+)\.*.*/, '$1').replace(/gallery\//, '');
     const getUrls = content => {
         const urls = [];
         if (content) {
@@ -29,22 +27,28 @@
         }
         return urls;
     };
-    app.$on('PluginEnabled', n => n === name && (enabled = true));
-    app.$on('PluginDisabled', n => n === name && (enabled = false));
-    app.$on('BeforeShowItem', item => {
-        if (enabled) {
-            let urls = [];
-            if (item) {
-                urls = urls.concat(getUrls(item.summary));
-                for (const i of item.content.keys()) {
-                    urls = urls.concat(getUrls(item.content[i]));
+    window.ReSSt.plugin.embedComponent({
+        name,
+        component: {
+            name: `plugin-${name}`,
+            template,
+            props: ['text'],
+            created () {
+                this.urls = getUrls(this.text);
+            },
+            data () { return { urls: [] } },
+            watch: { text (val) { this.urls = getUrls(val);} },
+            components: {
+                [`plugin-${name}-embed`]: function() {
+                    return Promise.resolve({
+                        template: buttonTemplate,
+                        props: ['uri'],
+                        data () { return {imageId: null, show: localStorage.getItem('plugins_auto_play') === 'true' } },
+                        created () { this.imageId = getUrlId(this.uri); },
+                        watch: { uri (val) { this.imageId = getUrlId(val); this.show = localStorage.getItem('plugins_auto_play') === 'true'; } }
+                    });
                 }
-                for (const url of urls) {
-                    item.content.push(getImagurBtn(url));
-                } 
             }
         }
-        return item;
     });
-    app.$emit('PluginReady', name);
 })();

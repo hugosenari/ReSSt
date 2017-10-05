@@ -8,7 +8,9 @@
     </md-button>
     <md-layout md-flex="true" v-if="show">
         <p><a :href="'https://${name}.com/gifs/' + imageId" target="_blank" style="display: block; position: absolute">via GIPHY</a></p>
-        <div><iframe :src="'https://${name}.com/embed/' + imageId" frameBorder="0" allowFullScreen style="position:absolute;top:0;left:0;height:20%;"></iframe></div>
+        <div style="position:relative;padding-bottom:35%">
+            <iframe :src="'https://${name}.com/embed/' + imageId" frameBorder="0" allowFullScreen style="position:absolute;top:0;left:0;height:100%;"></iframe>
+        </div>
     </md-layout>
 </div>`;
     const getUrlId = path => path && path.replace(/.+giphy\.com\/(media|gifs)\/([^.#?\/]+)\.*.*/, '$2');
@@ -41,9 +43,9 @@
                     return Promise.resolve({
                         template: buttonTemplate,
                         props: ['uri'],
-                        data () { return {imageId: null, show: false } },
+                        data () { return {imageId: null, show: localStorage.getItem('plugins_auto_play') === 'true' } },
                         created () { this.imageId = getUrlId(this.uri); },
-                        watch: { uri (val) { this.imageId = getUrlId(val); } },
+                        watch: { uri (val) { this.imageId = getUrlId(val); this.show = localStorage.getItem('plugins_auto_play') === 'true'; } },
                     });
                 }
             }

@@ -7,8 +7,8 @@
         <md-button class="md-icon-button md-raised" title="show this" @click="show = true"  v-if="!show">
             <md-icon>play_arrow</md-icon>
         </md-button>
-        <div v-if="show" style="position:relative;padding-bottom:182%">
-            <iframe :src="'https://gfycat.com/ifr/' + imageId" frameborder="0" scrolling="no" style="position:absolute;top:0;left:0;height:20%;" allowfullscreen></iframe>
+        <div v-if="show" style="position:relative;padding-bottom:35%">
+            <iframe :src="'https://gfycat.com/ifr/' + imageId" frameborder="0" scrolling="no" style="position:absolute;top:0;left:0;height:100%;" allowfullscreen></iframe>
         </div>
 </div>`;
     const getUrlId = path => path && path.replace(/.+gfycat\.com\/([^.#?]+)\.*.*/, '$1');
@@ -43,9 +43,9 @@
                     return Promise.resolve({
                         template: buttonTemplate,
                         props: ['uri'],
-                        data () { return {imageId: null, show: false } },
+                        data () { return {imageId: null, show: localStorage.getItem('plugins_auto_play') === 'true' } },
                         created () { this.imageId = getUrlId(this.uri); },
-                        watch: { uri (val) { this.imageId = getUrlId(val); } }
+                        watch: { uri (val) { this.imageId = getUrlId(val); this.show = localStorage.getItem('plugins_auto_play') === 'true'; } }
                     });
                 }
             }

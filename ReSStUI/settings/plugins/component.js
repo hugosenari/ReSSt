@@ -13,6 +13,7 @@ window.ReSSt.settings.plugins = Promise.resolve({
                 { name: 'giphy', address: './plugins/giphy.js'},
                 { name: 'imgurian', address: './plugins/imgurian.js'}
             ],
+            auto_play: localStorage.getItem('plugins_auto_play') === 'true'
         };
     },
     created () {
@@ -23,7 +24,9 @@ window.ReSSt.settings.plugins = Promise.resolve({
         app.$on('PluginDisabled', this.updatePluginList);
         this.updatePluginList();
     },
-    watch: {},
+    watch: {
+        auto_play: val => localStorage.setItem('plugins_auto_play', val), 
+    },
     methods: {
         updatePluginList() {
             this.plugins = JSON.parse(localStorage.getItem('plugins') || '{}');
