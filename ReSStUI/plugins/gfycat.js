@@ -1,7 +1,10 @@
 /*jshint esversion: 6 */
 
 (() => {
-    const name = 'gfycat'
+    const name = 'gfycat';
+    const urlMatch = /.+gfycat\.com\//;
+    const getUrlId = path => path && path.replace(/.+gfycat\.com\/([^.#?]+)\.*.*/, '$1');
+    const iframeUrl = `'https://${name}.com/ifr/' + imageId`;
     const template = `<div class="embed-plugin"><md-content v-for="url in urls"><plugin-${name}-embed :uri="url"></plugin-${name}-embed></md-content></div>`;
     const buttonTemplate = `<div class="embed-plugin-item">
     <md-button class="md-icon-button md-raised" title="show this" @click="show = true" v-if="!show">
@@ -9,24 +12,13 @@
     </md-button>
     <div v-if="show" class="embed-plugin-frame">
         <iframe frameBorder="0" allowFullScreen
-        :src="'https://gfycat.com/ifr/' + imageId"></iframe>
+            :src="${iframeUrl}"></iframe>
     </div>
 </div>`;
-    const getUrlId = path => path && path.replace(/.+gfycat\.com\/([^.#?-]+)\.*.*/, '$1');
     const getUrls = content => {
-        const urls = [];
-        if (content) {
-            const matches = content.match(/href=["'][^'"]+/g);
-            if (matches) {
-                for (const match of matches){
-                    const url = match.replace(/href=["']/, '');
-                    if (url.match(/.+gfycat\.com\//)){
-                        urls.push(url);
-                    }
-                }
-            }
-        }
-        return urls;
+        const matches = content && content.match(/href=["'][^'"]+/g) || [];
+        return matches.filter(match => match.match(urlMatch))
+            .map(match => match.replace(/href=["']/, ''));
     };
     window.ReSSt.plugin.embedComponent({
         name,
@@ -34,17 +26,15 @@
             name: `plugin-${name}`,
             template,
             props: ['text'],
-            created () {
-                this.urls = getUrls(this.text);
-            },
-            data () { return { urls: [] } },
+            created () { this.urls = this.text ? getUrls(this.text) : []; },
+            data () { return { urls: [] }; },
             watch: { text (val) { this.urls = getUrls(val); } },
             components: {
                 [`plugin-${name}-embed`]: function() {
                     return Promise.resolve({
                         template: buttonTemplate,
                         props: ['uri'],
-                        data () { return {imageId: null, show: localStorage.getItem('plugins_auto_play') === 'true' } },
+                        data () { return {imageId: null, show: localStorage.getItem('plugins_auto_play') === 'true' }; },
                         created () { this.imageId = getUrlId(this.uri); },
                         watch: { uri (val) { this.imageId = getUrlId(val); this.show = localStorage.getItem('plugins_auto_play') === 'true'; } }
                     });
