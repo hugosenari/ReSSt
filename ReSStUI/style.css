@@ -20,7 +20,7 @@ body {
 
 .embed-plugin-frame {
   position: relative;
-  padding-top: 50%;
+  padding-top: 80%;
 }
 
 .embed-plugin .embed-plugin-item .embed-plugin-frame iframe {
