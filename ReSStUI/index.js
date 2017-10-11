@@ -89,7 +89,7 @@ const App = {
         getList() { return ReSSt.data.list; },
         setList(values=[]) {
           ReSSt.data.list = {};
-          for (const item of values) {
+          for (const item of values.filter(i => !!i)) {
               item.active = false;
               ReSSt.data.list[item.uid] = item;
           }

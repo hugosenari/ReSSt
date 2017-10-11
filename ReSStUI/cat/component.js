@@ -27,11 +27,11 @@ window.ReSSt.cat = Promise.resolve({
             });
             const show_readed = localStorage.getItem('show_readed');
             const unread = show_readed === 'true' ? '' : '&unread=1'; 
-            return load(`parent=${uid}${unread}`)
+            return load(`tree=${uid}${unread}`)
                 .then(body => {
                     let items = [];
                     for (const item of body.Items) {
-                        items = items.concat(item.Items);
+                        items = item.Items && items.concat(item.Items) || items;
                     }
                     this.current = items[0];
                     this.Items = setList(items) || {};
