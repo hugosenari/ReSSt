@@ -5,7 +5,7 @@
     const urlMatch = /.+giphy\.com\//;
     const getUrlId = path => path && path.replace(/.+giphy\.com\/(media|gifs)\/([^.#?\/]+)\.*.*/, '$2');
     const iframeUrl = `'https://${name}.com/embed/' + imageId`; 
-    const template = `<div class="embed-plugin"><md-content v-for="url in urls"><plugin-${name}-embed :uri="url"></plugin-${name}-embed></md-content></div>`;
+    const template = `<div class="embed-plugin embed-plugin-${name}"><md-content v-for="url in urls"><plugin-${name}-embed :uri="url"></plugin-${name}-embed></md-content></div>`;
     const buttonTemplate = `<div class="embed-plugin-item">
     <md-button class="md-icon-button md-raised" title="show this" @click="show = true" v-if="!show">
         <md-icon>play_arrow</md-icon>

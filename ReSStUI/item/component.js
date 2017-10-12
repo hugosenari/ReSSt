@@ -23,16 +23,16 @@ window.ReSSt.item = Promise.resolve({
     },
     methods: {
         loadItem (...args) {
-            const uid = this.$route.params.item;
-            this.category = this.$route.params.category;
-            this.feed = this.$route.params.feed;
-            this.feed = this.feed !== '_' ? this.feed : '';
             const methods = this.$parent.$options.methods;
-            const list = methods.getList() || {};
             const load = methods.fetchData;
+            const list = methods.getList() || {};
+            const uid = this.$route.params.item;
+            this.feed = this.$route.params.feed;
+            const suffix = this.feed !== '_' ? `/this.feed` : '';
+            this.category = this.$route.params.category;
             this.self = list[uid] || { uid };
             this.setNav(uid, list);
-            this.$parent.$emit('BackTo', `#/feeds/${this.category}/${this.feed}`);
+            this.$parent.$emit('BackTo', `#/feeds/${this.category}${suffix}`);
             if(!this.self.loaded){
                 return load('uid=' + uid).then(body => {
                     load('', 'PATCH', { uid: uid });
@@ -62,14 +62,16 @@ window.ReSSt.item = Promise.resolve({
             const keys = Object.keys(list);
             const uidIndex = keys.indexOf(uid);
             const prev = keys[uidIndex - 1];
+            const feed = this.feed ? this.feed : '_';
+            const path = `#/feeds/${this.category}/${feed}`;
             if (prev) {
-                this.previous = prev && `#/feeds/${this.category}/${this.self.parent}/${prev}`; 
+                this.previous = `${path}/${prev}`; 
             } else {
                 this.previous = null;
             }
             const next = keys[uidIndex + 1];
             if (next){
-                this.next = `#/feeds/${this.category}/${this.self.parent}/${next}`;
+                this.next = `${path}/${next}`;
             } else {
                 this.next = null;
             }

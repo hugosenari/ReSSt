@@ -30,3 +30,7 @@ body {
   height: 80%;
   top: 0;
 }
+
+.embed-plugin-imgurian .embed-plugin-item .embed-plugin-frame iframe {
+    max-width: 540px;
+}
