@@ -4,7 +4,7 @@
     const name = 'imgurian';
     const urlMatch = /.+imgur\.com\//;
     const getUrlId = path => path && path.replace(/.+imgur\.com\/([^.#?]+)\.*.*/, '$1').replace(/gallery\//, '');
-    const iframeUrl = `'https://imgur.com/'+ imageId + '/embed'`;
+    const iframeUrl = `'https://imgur.com/'+ imageId + '/embed?pub=true'`;
     const template = `<div class="embed-plugin"><md-content v-for="url in urls"><plugin-${name}-embed :uri="url"></plugin-${name}-embed></md-content></div>`;
     const buttonTemplate = `<div class="embed-plugin-item">
     <md-button class="md-icon-button md-raised" title="show this" @click="show = true" v-if="!show">
