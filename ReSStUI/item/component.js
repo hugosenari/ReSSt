@@ -85,8 +85,9 @@ window.ReSSt.item = Promise.resolve({
                     this.$parent.$router.push({ path: this.previous.replace('#', '')});
                 } else if (code === RIGHT && this.next) {
                     this.$parent.$router.push({ path: this.next.replace('#', '')});
-                } else if (code === O) {
-                    window.open(this.link, this.uid);
+                } else if (this.self && code === O) {
+                    console.log(this.self);
+                    window.open(this.self.link, this.self.uid);
                 }
             }
         },
