@@ -18,9 +18,7 @@ window.ReSSt.item = Promise.resolve({
         this.$on('UnregisterEmbeder', this.unregisterEmbeder);
         this.loadItem();
     },
-    watch: {
-        '$route': 'loadItem'
-    },
+    watch: { '$route': 'loadItem' },
     methods: {
         loadItem (...args) {
             const methods = this.$parent.$options.methods;
