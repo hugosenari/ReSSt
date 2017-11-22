@@ -81,6 +81,19 @@ class By(Subscriptable):
     ))
     DEFAULT = parent
 
+def list_params(conditions):
+    for condition in [c for c in conditions if c]:
+        if  hasattr(condition, 'get_expression'):
+            exp = condition.get_expression()
+            yield [exp.get('operator'), list(list_params(exp.get('values')))]
+        elif hasattr(condition, 'name'):
+            yield condition.name
+        else:
+            yield condition
+
+def print_params(conditions):
+    for val in list_params(conditions):
+        print(val)
 
 def params(x, filex=None, key=None, last=None):
     result = { }
@@ -109,6 +122,7 @@ def params(x, filex=None, key=None, last=None):
             filex = filex or (By.unread(x)| By.n_item(x));
     if filex:
         result['FilterExpression'] = filex
+    print_params([result.get('KeyConditionExpression'), result.get('FilterExpression')])
     return result
 
 class ScanBy(Subscriptable):
