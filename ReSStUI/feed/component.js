@@ -7,7 +7,8 @@ window.ReSSt.feed = Promise.resolve({
             self: {},
             current: null,
             Items: {},
-            empty: false
+            empty: false,
+            nextPage: null
         };
     },
     created () {
@@ -26,8 +27,9 @@ window.ReSSt.feed = Promise.resolve({
                 this.self = body.Items[0]; 
             });
             const show_readed = localStorage.getItem('show_readed');
-            const unread = show_readed === 'true' ? '' : '&unread=1'; 
-            return load(`parent=${uid}${unread}`)
+            const unread = show_readed === 'true' ? '' : '&unread=1';
+            const last = this.$route.query.last ? `last=${this.$route.query.last}` : '';
+            return load(`parent=${uid}${unread}${last}`)
                 .then(body => {
                     const items = body.Items;
                     this.current = items[0];
@@ -39,6 +41,10 @@ window.ReSSt.feed = Promise.resolve({
                         this.empty = true;
                     }
                     this.loading = false;
+                    this.nextPage = body.LastEvaluatedKey;
+                    if (!items && this.nextPage) {
+                        this.$router.push({ query: { last: this.nextPage }});
+                    }
                 });
         },
         onNav(code) {
