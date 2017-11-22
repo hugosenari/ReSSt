@@ -100,6 +100,8 @@ def print_params(conditions):
 
 def params(x, filex=None, key=None, last=None):
     result = { }
+    if x.get('last'):
+        result['ExclusiveStartKey'] = json.loads('{' + x.get('last').replace('%3A', ':') + '}')
     if last:
         result['ExclusiveStartKey'] = last
     if key:
@@ -123,6 +125,8 @@ def params(x, filex=None, key=None, last=None):
             result['IndexName'] = UNREAD_INDEX
         else:
             filex = filex or (By.unread(x)| By.n_item(x))
+    if result.get('KeyConditionExpression') and not x.get('sort'):
+        result['ScanIndexForward'] = True
     if filex:
         result['FilterExpression'] = filex
     print_params([result.get('KeyConditionExpression'), result.get('FilterExpression')])
