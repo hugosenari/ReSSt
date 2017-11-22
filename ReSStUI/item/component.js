@@ -26,7 +26,7 @@ window.ReSSt.item = Promise.resolve({
             const list = methods.getList() || {};
             const uid = this.$route.params.item;
             this.feed = this.$route.params.feed;
-            const suffix = this.feed !== '_' ? `/this.feed` : '';
+            const suffix = this.feed !== '_' ? `/${this.feed}` : '';
             this.category = this.$route.params.category;
             this.self = list[uid] || { uid };
             this.setNav(uid, list);
