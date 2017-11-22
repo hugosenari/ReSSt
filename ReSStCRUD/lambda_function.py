@@ -92,8 +92,11 @@ def list_params(conditions):
             yield condition
 
 def print_params(conditions):
-    for val in list_params(conditions):
-        print(val)
+    try:
+        for val in list_params(conditions):
+            print(val)
+    except e:
+        print(e)
 
 def params(x, filex=None, key=None, last=None):
     result = { }
@@ -109,17 +112,17 @@ def params(x, filex=None, key=None, last=None):
         if key == 'parent' or not key:
             result['IndexName'] = PARENT_INDEX
         else:
-            filex = filex or By.parent(x);
+            filex = filex or By.parent(x)
     if 'xmlUrl' in x or 'feeds' in x:
         if key == 'xmlUrl' or not key:
             result['IndexName'] = FEEDS_INDEX
         else:
-            filex = filex or By.xmlUrl(x);
+            filex = filex or By.xmlUrl(x)
     if 'unread' in x:
         if key == 'unread_since' or not key:
             result['IndexName'] = UNREAD_INDEX
         else:
-            filex = filex or (By.unread(x)| By.n_item(x));
+            filex = filex or (By.unread(x)| By.n_item(x))
     if filex:
         result['FilterExpression'] = filex
     print_params([result.get('KeyConditionExpression'), result.get('FilterExpression')])
