@@ -11,7 +11,8 @@ window.ReSSt.settings.plugins = Promise.resolve({
                 { name: 'chicken', address: './plugins/chicken.js'},
                 { name: 'gfycat', address: './plugins/gfycat.js'},
                 { name: 'giphy', address: './plugins/giphy.js'},
-                { name: 'imgurian', address: './plugins/imgurian.js'}
+                { name: 'imgurian', address: './plugins/imgurian.js'},
+                { name: 'vreddit', address: './plugins/vreddit.js'}
             ],
             auto_play: localStorage.getItem('plugins_auto_play') === 'true'
         };
