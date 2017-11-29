@@ -23,9 +23,7 @@ window.ReSSt.feed = Promise.resolve({
             const load = methods.fetchData;
             const setList = methods.setList;
             this.$parent.$emit('BackTo', '#/feeds');
-            load('uid=' + uid).then(body => {
-                this.self = body.Items[0]; 
-            });
+            load('uid=' + uid).then(body => { this.self = body.Items[0]; });
             const show_readed = localStorage.getItem('show_readed');
             const unread = show_readed === 'true' ? '' : '&unread=1';
             const last = this.$route.query.last ? `&last=${this.$route.query.last.replace(/{*}*/g, '')}` : '';
@@ -34,10 +32,9 @@ window.ReSSt.feed = Promise.resolve({
                     const items = body.Items;
                     this.current = items[0];
                     this.Items = setList(items) || {};
+                    this.empty = !this.current;
                     if (this.current) {
                         this.current.active = true;
-                    } else {
-                        this.loading = false;
                     }
                     this.loading = false;
                     this.nextPage = body.LastEvaluatedKey;
