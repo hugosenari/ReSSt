@@ -1,17 +1,17 @@
 /*jshint esversion: 6 */
 
 (() => {
-    const name = 'vreddit';
-    const urlMatch = /.+v\.redd\.it\//;
-    const getUrlId = path => path && path.replace(/.+v\.redd\.it\/([^#?]+)/, '$1');
-    const iframeUrl = `'https://v.redd.it/'+ imageId + '/DASH_600_K'`;
+    const name = 'ireddit';
+    const urlMatch = /.+i\.redd\.it\//;
+    const getUrlId = path => path && path.replace(/.+i\.redd\.it\/([^#?]+)/, '$1');
+    const iframeUrl = `'https://i.redd.it/'+ imageId`;
     const template = `<div class="embed-plugin embed-plugin-${name}"><md-content v-for="url in urls"><plugin-${name}-embed :uri="url"></plugin-${name}-embed></md-content></div>`;
     const buttonTemplate = `<div class="embed-plugin-item">
     <md-button class="md-icon-button md-raised" title="show this" @click="show = true" v-if="!show">
         <md-icon>play_arrow</md-icon>
     </md-button>
     <div v-if="show" class="embed-plugin-frame" style="padding-top:0">
-        <video autoplay loop controls :src="${iframeUrl}"/>
+        <img :src="${iframeUrl}"/>
     </div>
 </div>`;
     const getUrls = content => {
