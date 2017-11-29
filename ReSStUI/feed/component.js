@@ -38,7 +38,6 @@ window.ReSSt.feed = Promise.resolve({
                         this.current.active = true;
                     } else {
                         this.loading = false;
-                        this.empty = true;
                     }
                     this.loading = false;
                     this.nextPage = body.LastEvaluatedKey;
