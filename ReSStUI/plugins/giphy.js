@@ -3,7 +3,11 @@
 (() => {
     const name = 'giphy';
     const urlMatch = /.+giphy\.com\//;
-    const getUrlId = path => path && path.replace(/.+giphy\.com\/(media|gifs)\/([^.#?\/]+)\.*.*/, '$2').split('-').pop();
+    const getUrlId = path => path && path
+        .replace(/.+giphy\.com\/(media|gifs)\/([^.#?\/]+)\.*.*/, '$2')
+        .replace(/.+giphy\.com\/([^.#?\/]+)\.*.*/, '$1')
+        .split('-')
+        .pop();
     const iframeUrl = `'https://${name}.com/embed/' + imageId`; 
     const template = `<div class="embed-plugin embed-plugin-${name}"><md-content v-for="url in urls"><plugin-${name}-embed :uri="url"></plugin-${name}-embed></md-content></div>`;
     const buttonTemplate = `<div class="embed-plugin-item">
