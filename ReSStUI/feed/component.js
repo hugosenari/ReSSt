@@ -42,14 +42,15 @@ window.ReSSt.feed = Promise.resolve({
                     const items = body.Items;
                     this.current = items[0];
                     this.Items = setList(items) || {};
-                    this.empty = !this.current;
                     if (this.current) {
                         this.current.active = true;
                     }
-                    this.loading = false;
                     this.nextPage = body.LastEvaluatedKey;
                     if (!items.length && this.nextPage) {
                         this.$router.push({ query: { last: JSON.stringify(this.nextPage) }});
+                    } else {
+                        this.loading = false;
+                        this.empty = !this.current;
                     }
                 });
         },
