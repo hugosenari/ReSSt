@@ -11,9 +11,19 @@ window.ReSSt.feed = Promise.resolve({
             nextPage: null
         };
     },
-    created () {
+    created() {
         this.loadFeeds();
-        this.$parent.$on('WindowKeyUp', code => this.onNav(code));
+        this.$parent.$off('WindowKeyUp');
+        this.$parent.$on('WindowKeyUp', code => {
+            const LEFT = 37;
+            const RIGHT = 39;
+            const O = 79;
+            const R = 82;
+            if (code === RIGHT) return this.nextItem();
+            if (code === LEFT) return this.prevItem();
+            if (code === O) return this.openItem();
+            if (code === R) return this.markAsRead();
+        });
     },
     watch: { '$route': 'loadFeeds' },
     methods: {
@@ -43,35 +53,29 @@ window.ReSSt.feed = Promise.resolve({
                     }
                 });
         },
-        onNav(code) {
-            if (this.$route.name === 'ReSSt.feed'){
-                const LEFT = 37;
-                const RIGHT = 39;
-                const O = 79;
-                const R = 82;
-                const keys = Object.keys(this.Items);
-                const uidIndex = this.current && keys.indexOf(this.current.uid) || 0;
-                const prev = keys[uidIndex - 1];
-                const next = keys[uidIndex + 1];
-                if(code === LEFT && prev) {
-                    this.moveTo(prev);
-                } else if (code === RIGHT && next) {
-                    this.moveTo(next);
-                } else if (code === O && this.current) {
-                    window.open(this.current.link, this.current.uid);
-                } else if (code === R && this.current) {
-                    this.$parent.$options.methods.fetchData(
-                         '', 'PATCH', { uid: this.current.uid }
-                    );
-                    const old = this.current;
-                    if (next || prev) {
-                        this.moveTo(next || prev);
-                    }
-                    delete this.Items[old.uid];
-                }
+        openItem() {
+            if (this.current && this.current.link)
+                window.open(this.current.link, this.current.uid);
+        },
+        getNext(x = 1) {
+            const keys = Object.keys(this.Items || {});
+            const uidIndex = this.current && keys.indexOf(this.current.uid) || 0;
+            return keys[uidIndex + x];
+        },
+        markAsRead() {
+            if (this.current) {
+                this.$parent.$options.methods.fetchData(
+                     '', 'PATCH', { uid: this.current.uid }
+                );
+                const old = this.current;
+                this.moveTo(this.getNext() || this.getNext(-1));
+                delete this.Items[old.uid];
             }
         },
+        nextItem() { this.moveTo(this.getNext()); },
+        prevItem() { this.moveTo(this.getNext(-1)); },
         moveTo(uid) {
+            if (!uid) return;
             this.$set(this.current, 'active', false);
             this.$set(this.Items, this.current.uid, this.current);
             this.current = this.Items[uid];

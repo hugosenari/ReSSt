@@ -13,6 +13,20 @@ const loaded = (name) => new Promise(resolve => {
     hasRessource();
 });
 
+const vueUse = (Vue, ...names) => {
+    const results = [Vue];
+    for (const name of names) {
+        const result = loaded(name).then(o => {
+            Vue.use(o);
+            return o;
+        });
+        results.push(result);
+    }
+    return Promise.all(results);
+};
+
+const waitVue = (...names) => loaded('Vue').then(Vue => vueUse(Vue, ...names));
+
 const loadComponent = (name, path = '', namespace = ReSSt) => {
     const tp = fetch(`${path}${name}/component.html`).then(response => response.text());
     const js = fetch(`${path}${name}/component.js`).then(responde => responde.text())
@@ -101,23 +115,16 @@ const App = {
     }
 };
 
-loaded('Vue').then(Vue => {
-    loaded('VueMaterial').then(VueMaterial => {
-        Vue.use(window.VueMaterial);
-        loaded('VueRouter').then(VueRouter => {
-            Vue.use(VueRouter);
-            const router = new VueRouter({ routes });
-            router.beforeEach((to, fron, next) => {
-                const token = localStorage.getItem('api_key') && localStorage.getItem('api_endpoint');
-                const path = to.path;
-                let newPath = token ? undefined : ROOT;
-                newPath = path === ROOT && token ? '/feeds' : newPath;
-                return newPath !== path ? next(newPath) : next();
-            });
-            return router;
-        }).then(router => {
-            App.router = router;
-            ReSSt.App = new window.Vue(App);
-        });
-    });
+const routeLogic = (to, fron, next) => {
+    const token = localStorage.getItem('api_key') && localStorage.getItem('api_endpoint');
+    const path = to.path;
+    let newPath = token ? undefined : ROOT;
+    newPath = path === ROOT && token ? '/feeds' : newPath;
+    return newPath !== path ? next(newPath) : next();
+};
+
+waitVue('VueRouter', 'VueMaterial').then(([Vue, VueRouter]) => {
+    App.router = new VueRouter({ routes });
+    App.router.beforeEach(routeLogic);
+    ReSSt.App = new window.Vue(App);
 });
