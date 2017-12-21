@@ -29,6 +29,7 @@ window.ReSSt.feed = Promise.resolve({
     methods: {
         loadFeeds () {
             const uid = this.$route.params.feed;
+            this.Items = JSON.parse(localStorage.getItem(`feed${uid}`) || '{}');
             const methods = this.$parent.$options.methods;
             const load = methods.fetchData;
             const setList = methods.setList;
@@ -42,6 +43,7 @@ window.ReSSt.feed = Promise.resolve({
                     const items = body.Items;
                     this.current = items[0];
                     this.Items = setList(items) || {};
+                    localStorage.setItem(`feed${uid}`, JSON.stringify(this.Items));
                     if (this.current) {
                         this.current.active = true;
                     }
@@ -71,6 +73,7 @@ window.ReSSt.feed = Promise.resolve({
                 const old = this.current;
                 this.moveTo(this.getNext() || this.getNext(-1));
                 delete this.Items[old.uid];
+                localStorage.setItem(`feed${uid}`, JSON.stringify(this.Items));
             }
         },
         nextItem() { this.moveTo(this.getNext()); },

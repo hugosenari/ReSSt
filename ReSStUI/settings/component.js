@@ -1,11 +1,16 @@
 /*jshint esversion: 6 */
 
-window.ReSSt.settings = Promise.resolve({
+window.ReSSt.settings = window.ReSSt
+.mapState('backto')
+.then(({ set, get, loadComponent }) => ({
     components: {
-        'settings-service' : () => window.ReSSt.loadComponent('service', 'settings/', window.ReSSt.settings)(),
-        'settings-plugins' : () => window.ReSSt.loadComponent('plugins', 'settings/', window.ReSSt.settings)()
+        'settings-service' : () => loadComponent('service', 'settings/', window.ReSSt.settings)(),
+        'settings-plugins' : () => loadComponent('plugins', 'settings/', window.ReSSt.settings)()
     },
     created () {
-        this.$parent.$emit('BackTo', '#/feeds');
+        console.log(get(this, 'backto'));
+        if (!get(this, 'backto')) {
+            set(this, 'backto', '#/feeds');
+        }
     }
-});
+}));
