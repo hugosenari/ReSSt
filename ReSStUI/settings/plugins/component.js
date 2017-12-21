@@ -23,13 +23,16 @@ window.ReSSt.settings.plugins = window.ReSSt
             methods: {
                 loadPlugin(plugin_name, plugin_address) {
                     app.$emit('LoadPlugin', plugin_name, plugin_address);
+                    this.$forceUpdate();
                 },
                 unloadPlugin(name) {
                     app.$emit('RemovePlugin', name);
+                    this.$forceUpdate();
                 },
                 changePluginState(name, state) {
                     const eventName =  state ? 'PluginEnabled' : 'PluginDisabled';
                     app.$emit(eventName, name);
+                    this.$forceUpdate();
                 }
             }
         }

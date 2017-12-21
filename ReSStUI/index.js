@@ -67,6 +67,8 @@ const fetchData = ({ state, mode = 'cors', cache = 'default'}, params='', method
         .then(response => response.json());
 };
 const lib = (obj) => {
+    obj.Vue = window.Vue;
+    obj.Vuex = window.Vuex;
     obj.app = ReSSt.App;
     obj.loadComponent = loadComponent;
     obj.fetchData = fetchData;

@@ -38,9 +38,9 @@
                     return Promise.resolve({
                         template: buttonTemplate,
                         props: ['uri'],
-                        data () { return {imageId: null, show: localStorage.getItem('plugins_auto_play') === 'true' }; },
+                        data () { return {imageId: null, show: this.$store.state.pluginsAutoPlay }; },
                         created () { this.imageId = getUrlId(this.uri); },
-                        watch: { uri (val) { this.imageId = getUrlId(val); this.show = localStorage.getItem('plugins_auto_play') === 'true'; } },
+                        watch: { uri (val) { this.imageId = getUrlId(val); this.show = this.$store.state.pluginsAutoPlay; } },
                     });
                 }
             }
