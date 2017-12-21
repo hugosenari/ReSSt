@@ -67,12 +67,19 @@ const fetchData = ({ state, mode = 'cors', cache = 'default'}, params='', method
         .then(response => response.json());
 };
 const lib = (obj) => {
-    obj.Vue = window.Vue;
-    obj.Vuex = window.Vuex;
-    obj.app = ReSSt.App;
-    obj.loadComponent = loadComponent;
-    obj.fetchData = fetchData;
-    return obj; 
+    return Promise.all([
+        loaded('Vue'),
+        loaded('Vuex')
+    ]).then(
+        ([Vue, Vuex]) => {
+            obj.Vue;
+            obj.Vuex;
+            obj.app = ReSSt.App;
+            obj.loadComponent = loadComponent;
+            obj.fetchData = fetchData;
+            return obj;
+        }
+    );
 };
 const mapState = (...args ) =>loaded('Vuex').then(Vuex => {
     const result = {};
@@ -106,7 +113,7 @@ const Store = {
         set_showReaded: (state) => setter(state, 'showReaded', !state.showReaded),
         set_plugins: (state, plugins) => setterObj(state, 'plugins', plugins),
         set_pluginsAutoPlay: (state) => setter(state, 'pluginsAutoPlay', !state.pluginsAutoPlay),
-        set_feedItems: (state, uid, items) => { state.feeds[uid] = items; saveString('feeds', state.feeds); },
+        set_feedItems: (state, { uid, items }) => { state.feeds[uid] = items; saveString('feeds', state.feeds);},
         set_categories: (state, categories) => setterObj(state, 'categories', categories),
     }
 };
@@ -158,6 +165,7 @@ const App = {
         getList() { return ReSSt.data.list; },
         setList(values=[]) {
           ReSSt.data.list = {};
+          values.filter(i => !!i)
           for (const item of values.filter(i => !!i)) {
               item.active = false;
               ReSSt.data.list[item.uid] = item;
