@@ -72,8 +72,8 @@ const lib = (obj = {}) => {
         loaded('Vuex')
     ]).then(
         ([Vue, Vuex]) => {
-            obj.Vue;
-            obj.Vuex;
+            obj.Vue = Vue;
+            obj.Vuex = Vuex;
             obj.app = () => ReSSt.App;
             obj.loadComponent = loadComponent;
             obj.fetchData = fetchData;
