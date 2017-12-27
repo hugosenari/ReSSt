@@ -2,7 +2,7 @@
 
 window.ReSSt.plugin = window.ReSSt
 .mapState('pluginsAutoPlay', 'plugins')
-.then(({ pluginsAutoPlay, plugins, app, set, get }) => {
+.then(({ pluginsAutoPlay, plugins, set, get }) => {
     return {
         created () {
             this.loadPlugins();
@@ -33,7 +33,7 @@ window.ReSSt.plugin = window.ReSSt
                 return this.setPlugins(plugins);
             },
             removePlugin(name) {
-                app.$emit('PluginDisabled', name);
+                this.$root.$emit('PluginDisabled', name);
                 const plugins = this.getPlugins();
                 delete plugins[name];
                 return this.setPlugins(plugins);
@@ -57,7 +57,7 @@ window.ReSSt.plugin = window.ReSSt
             },
             pluginReady(name) {
                 if (this._plugins.includes(name)) {
-                    app.$emit('PluginEnabled', name);
+                    this.$root.$emit('PluginEnabled', name);
                 }
             },
             pluginEnabled(name) {
@@ -71,11 +71,11 @@ window.ReSSt.plugin = window.ReSSt
                 return this.setPluginState(name, false);
             },
             loadPlugins() {
-                app.$on('LoadPlugin', this.loadPlugin);
-                app.$on('RemovePlugin', this.removePlugin);
-                app.$on('PluginReady', this.pluginReady);
-                app.$on('PluginEnabled', this.pluginEnabled);
-                app.$on('PluginDisabled', this.pluginDisabled);
+                this.$root.$on('LoadPlugin', this.loadPlugin);
+                this.$root.$on('RemovePlugin', this.removePlugin);
+                this.$root.$on('PluginReady', this.pluginReady);
+                this.$root.$on('PluginEnabled', this.pluginEnabled);
+                this.$root.$on('PluginDisabled', this.pluginDisabled);
                 this._plugins = [];
                 const plugins = this.getPlugins();
                 for (const name of Object.keys(plugins)) {
@@ -91,28 +91,28 @@ window.ReSSt.plugin = window.ReSSt
 });
 
 window.ReSSt.plugin.embedComponent = opts => {
-    let enabled = false;
-    let itemVue = null;
-    const Vue = window.Vue;
-    const app = window.ReSSt.App;
-    const name = opts.name;
-    const component = opts.component;
-    Vue.component(`plugin-${name}`, component);
-    app.$on('PluginEnabled', n => {
-        if (n === name) {
-            enabled = true;
-            itemVue && itemVue.$emit('RegisterEmbeder', component);
-        }
+    window.ReSSt.lib().then(({Vue, app}) => {
+        let enabled = false;
+        let itemVue = null;
+        const name = opts.name;
+        const component = opts.component;
+        Vue.component(`plugin-${name}`, component);
+        app().$on('PluginEnabled', n => {
+            if (n === name) {
+                enabled = true;
+                itemVue && itemVue.$emit('RegisterEmbeder', component);
+            }
+        });
+        app().$on('PluginDisabled', n => {
+            if (n === name) {
+                enabled = false;
+                itemVue && itemVue.$emit('UnregisterEmbeder', component);
+            }
+        });
+        app().$on('ItemView', vue => {
+            itemVue = vue;
+            enabled && itemVue.$emit('RegisterEmbeder', component);
+        });
+        app().$emit('PluginReady', name);
     });
-    app.$on('PluginDisabled', n => {
-        if (n === name) {
-            enabled = false;
-            itemVue && itemVue.$emit('UnregisterEmbeder', component);
-        }
-    });
-    app.$on('ItemView', vue => {
-        itemVue = vue;
-        enabled && itemVue.$emit('RegisterEmbeder', component);
-    });
-    app.$emit('PluginReady', name);
 };

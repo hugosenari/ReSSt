@@ -15,9 +15,7 @@ window.ReSSt.feed = window.ReSSt
                 };
             },
             computed: {
-                Items () {
-                    return get(this, 'feeds')[this.uid] || {}
-                }
+                Items () { return get(this, 'feeds'); }
             },
             created() {
                 this.loadFeeds();
@@ -45,10 +43,6 @@ window.ReSSt.feed = window.ReSSt
                     return fetchData( { state : this.$store.state }, `parent=${this.uid}${unread}${last}&sort=1`)
                         .then(body => {
                             const items = body.Items;
-                            this.$store.commit('set_feedItems', { 
-                                uid: this.uid,
-                                items: items.filter(i => i).reduce((r, v) => { r[v.uid] = v; return r; }, { })
-                            } );
                             this.current = items[0];
                             if (this.current)  this.current.active = true;
                             this.nextPage = body.LastEvaluatedKey;
@@ -58,6 +52,10 @@ window.ReSSt.feed = window.ReSSt
                                 this.loading = false;
                                 this.empty = !this.current;
                             }
+                            this.$store.commit('set_feedItems', { 
+                                uid: this.uid,
+                                items: items.filter(i => i).reduce((r, v) => { r[v.uid] = v; return r; }, { })
+                            });
                         });
                 },
                 openItem() {
@@ -75,9 +73,8 @@ window.ReSSt.feed = window.ReSSt
                             '', 'PATCH', { uid: this.current.uid }
                         );
                         const old = this.current;
+                        if(!get(this, 'showReaded')) this.$store.dispatch('delete_item', { feedUid: this.uid, uid: old.uid });
                         this.moveTo(this.getNext() || this.getNext(-1));
-                        delete this.Items[old.uid];
-                        this.$store.commit('set_feedItems', { uid: this.uid, items: this.Items });
                     }
                 },
                 nextItem() { this.moveTo(this.getNext()); },

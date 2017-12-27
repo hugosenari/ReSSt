@@ -17,5 +17,5 @@ window.ReSSt.feeds = window.ReSSt
                     set(this, 'backto');
                 }
             }
-        }
+        };
     });

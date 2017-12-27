@@ -66,7 +66,7 @@ const fetchData = ({ state, mode = 'cors', cache = 'default'}, params='', method
     return fetch(state.endpoint + '/ReSStCRUD?' + params, options)
         .then(response => response.json());
 };
-const lib = (obj) => {
+const lib = (obj = {}) => {
     return Promise.all([
         loaded('Vue'),
         loaded('Vuex')
@@ -74,7 +74,7 @@ const lib = (obj) => {
         ([Vue, Vuex]) => {
             obj.Vue;
             obj.Vuex;
-            obj.app = ReSSt.App;
+            obj.app = () => ReSSt.App;
             obj.loadComponent = loadComponent;
             obj.fetchData = fetchData;
             return obj;
@@ -90,8 +90,8 @@ const mapState = (...args ) =>loaded('Vuex').then(Vuex => {
             set: function(val) { this.$store.commit(`set_${k}`, val); },
         }
     }
-    result.set = (ths, attr, ...args) => result[attr].set.apply(ths, args);
-    result.get = (ths, attr) => result[attr].get.apply(ths, []);  
+    result.set = (ths, attr, val) => ths.$store.commit(`set_${attr}`, val);
+    result.get = (ths, attr) => ths.$store.state[attr];
     return result;
 }).then(result => lib(result));
 
@@ -113,8 +113,19 @@ const Store = {
         set_showReaded: (state) => setter(state, 'showReaded', !state.showReaded),
         set_plugins: (state, plugins) => setterObj(state, 'plugins', plugins),
         set_pluginsAutoPlay: (state) => setter(state, 'pluginsAutoPlay', !state.pluginsAutoPlay),
-        set_feedItems: (state, { uid, items }) => { state.feeds[uid] = items; saveString('feeds', state.feeds);},
-        set_categories: (state, categories) => setterObj(state, 'categories', categories),
+        set_feedItems: (state, { uid, items }) => {
+            state.feeds[uid] = items;
+            state.feeds = state.feeds;
+            saveString('feeds', state.feeds);
+        },
+        set_categories: (state, categories) => setterObj(state, 'categories', categories)
+    },
+    actions: {
+        delete_item: ({ state, commit }, { feedUid, uid }) => {
+            const items = state.feeds[feedUid];
+            delete items[uid];
+            commit('set_feedItems', { uid: feedUid, items });
+        }
     }
 };
 
@@ -164,13 +175,13 @@ const App = {
         },
         getList() { return ReSSt.data.list; },
         setList(values=[]) {
-          ReSSt.data.list = {};
-          values.filter(i => !!i)
-          for (const item of values.filter(i => !!i)) {
-              item.active = false;
-              ReSSt.data.list[item.uid] = item;
-          }
-          return ReSSt.data.list;
+            ReSSt.data.list = {};
+            values.filter(i => !!i)
+            for (const item of values.filter(i => !!i)) {
+                item.active = false;
+                ReSSt.data.list[item.uid] = item;
+            }
+            return ReSSt.data.list;
         }
     }
 };

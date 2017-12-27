@@ -6,7 +6,7 @@
         <md-progress md-indeterminate></md-progress>
     </div>
     <md-list>
-        <md-list-item v-for="item in Items" v-bind:class="{ 'md-primary': item.active }">
+        <md-list-item v-for="item in Items[uid]" v-bind:class="{ 'md-primary': item.active }">
             <router-link :to="'./' + self.uid + '/' + item.uid">
                 {{item.title}}
                 <md-icon v-if="item.active" class="material-icons">label_outline</md-icon>

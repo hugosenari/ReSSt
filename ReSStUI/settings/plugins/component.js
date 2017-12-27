@@ -2,7 +2,7 @@
 
 window.ReSSt.settings.plugins = window.ReSSt
     .mapState('pluginsAutoPlay', 'plugins')
-    .then(({ pluginsAutoPlay, plugins, app, set, get }) => {
+    .then(({ pluginsAutoPlay, plugins, set, get }) => {
         return {
             computed: { plugins, pluginsAutoPlay },
             data () {
@@ -22,16 +22,16 @@ window.ReSSt.settings.plugins = window.ReSSt
             },
             methods: {
                 loadPlugin(plugin_name, plugin_address) {
-                    app.$emit('LoadPlugin', plugin_name, plugin_address);
+                    this.$root.$emit('LoadPlugin', plugin_name, plugin_address);
                     this.$forceUpdate();
                 },
                 unloadPlugin(name) {
-                    app.$emit('RemovePlugin', name);
+                    this.$root.$emit('RemovePlugin', name);
                     this.$forceUpdate();
                 },
                 changePluginState(name, state) {
                     const eventName =  state ? 'PluginEnabled' : 'PluginDisabled';
-                    app.$emit(eventName, name);
+                    this.$root.$emit(eventName, name);
                     this.$forceUpdate();
                 }
             }
