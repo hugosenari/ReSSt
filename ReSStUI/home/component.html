@@ -4,13 +4,13 @@
         <md-input-container>
             <md-icon>http</md-icon>
             <label>API Endpoint</label>
-            <md-input v-model="api_endpoint"></md-input>
+            <md-input v-model="endpoint"></md-input>
         </md-input-container>
         <md-input-container>
             <md-icon>vpn_key</md-icon>
             <label>API Token</label>
-            <md-input v-model="api_key"></md-input>
+            <md-input v-model="key"></md-input>
         </md-input-container>
-        <md-button class="md-raised md-primary" v-on:click="onSave(api_endpoint, api_key)">Save</md-button>
+        <md-button class="md-raised md-primary" v-on:click="onSave">Save</md-button>
     </form>
 </md-content>

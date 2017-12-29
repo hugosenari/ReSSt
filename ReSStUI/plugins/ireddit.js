@@ -35,9 +35,9 @@
                     return Promise.resolve({
                         template: buttonTemplate,
                         props: ['uri'],
-                        data () { return {imageId: null, show: localStorage.getItem('plugins_auto_play') === 'true', height: 0 }; },
+                        data () { return {imageId: null, show: this.$store.state.pluginsAutoPlay, height: 0 }; },
                         created () { this.imageId = getUrlId(this.uri); listen(this);},
-                        watch: { uri (val) { this.imageId = getUrlId(val); this.show = localStorage.getItem('plugins_auto_play') === 'true'; } }
+                        watch: { uri (val) { this.imageId = getUrlId(val); this.show = this.$store.state.pluginsAutoPlay; } }
                     });
                 }
             }

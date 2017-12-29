@@ -1,27 +1,21 @@
 /*jshint esversion: 6 */
 
-window.ReSSt.feeds = Promise.resolve({
-    data () {
+window.ReSSt.feeds = window.ReSSt
+    .mapState('categories', 'backto')
+    .then(({ categories, backto, set, fetchData })  => {
         return {
-            loading: true,
-            categories: []
+            computed: { categories, backto },
+            data () { return { loading: true }; },
+            created () { this.loadCategories(); },
+            watch: { '$route': 'loadCategories' },
+            methods: {
+                loadCategories () {
+                    const { state } = this.$store;
+                    fetchData({ state }, 'tree=root')
+                        .then(body => set(this, 'categories', body.Items))
+                        .then(() => this.loading = false);
+                    set(this, 'backto');
+                }
+            }
         };
-    },
-    created () { this.loadCategories(); },
-    watch: { '$route': 'loadCategories' },
-    methods: {
-        loadCategories () {
-            const methods = this.$parent.$options.methods;
-            const load = methods.fetchData;
-            this.$parent.$emit('BackTo', null);
-            this.categories = JSON.parse(localStorage.getItem('feeds') || '[]');
-            return load('tree=root')
-                .then(body => {
-                    const items = body.Items;
-                    localStorage.setItem('feeds', JSON.stringify(items));
-                    this.categories = items;
-                    this.loading = false;
-                });
-        }
-    }
-});
+    });

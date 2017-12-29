@@ -1,101 +1,85 @@
 /*jshint esversion: 6 */
 
-window.ReSSt.item = Promise.resolve({
-    data () {
+window.ReSSt.item = window.ReSSt
+    .mapState('feeds', 'backto')
+    .then(({get, set, fetchData}) => {
         return {
-            self: {},
-            share: "",
-            previous: null,
-            next: null,
-            category: "c",
-            feed: '_',
-            embedders: []
-        };
-    },
-    created () {
-        this.$parent.$on('WindowKeyUp', code => this.onNav(code));
-        this.$on('RegisterEmbeder', this.registerEmbeder);
-        this.$on('UnregisterEmbeder', this.unregisterEmbeder);
-        this.loadItem();
-    },
-    watch: { '$route': 'loadItem' },
-    methods: {
-        loadItem (...args) {
-            const methods = this.$parent.$options.methods;
-            const load = methods.fetchData;
-            const list = methods.getList() || {};
-            const uid = this.$route.params.item;
-            this.feed = this.$route.params.feed;
-            const suffix = this.feed !== '_' ? `/${this.feed}` : '';
-            this.category = this.$route.params.category;
-            this.self = list[uid] || { uid };
-            this.setNav(uid, list);
-            this.$parent.$emit('BackTo', `#/feeds/${this.category}${suffix}`);
-            if(!this.self.loaded){
-                return load('uid=' + uid).then(body => {
-                    load('', 'PATCH', { uid: uid });
-                    if (this.self.uid === body.Items[0].uid) {
-                        this.self = Object.assign({}, this.self, body.Items[0], {loaded: true});
-                        this.setShare(this.self.link);
+            data () {
+                return {
+                    self: {},
+                    share: '',
+                    previous: null,
+                    next: null,
+                    embedders: []
+                };
+            },
+            computed: {
+                uid () { return this.$route.params.item; },
+                feed () { return this.$route.params.feed; },
+                category () { return this.$route.params.category; },
+                parentUid () { return this.feed != '_' ? this.feed : this.category; },
+                allItems () { return get(this, 'feeds') || {}; },
+                items () { return this.allItems[this.parentUid] || {}; },
+                cachedSelf () { return this.items[this.uid] || { uid: this.uid} }
+            },
+            created () {
+                this.$root.$off('WindowKeyUp');
+                this.$root.$on('WindowKeyUp', code => this.onNav(code));
+                this.$on('RegisterEmbeder', this.registerEmbeder);
+                this.$on('UnregisterEmbeder', this.unregisterEmbeder);
+                this.loadItem();
+            },
+            watch: { '$route': 'loadItem' },
+            methods: {
+                loadItem (...args) {
+                    this.setBack();
+                    this.setNav();
+                    this.self = this.cachedSelf;
+                    if(!this.self.loaded){
+                        return fetchData({ state : this.$store.state }, 'uid=' + this.uid).then(body => {
+                            fetchData({ state : this.$store.state }, '', 'PATCH', { uid: this.uid });
+                            if (this.self.uid === body.Items[0].uid) {
+                                this.$root.$emit('BeforeShowItem', body.Items[0]);
+                                this.self = Object.assign({}, this.self, body.Items[0], {loaded: true});
+                                this.$root.$emit('ItemView', this);
+                            }
+                        });
                     }
-                    this.$parent.$emit('BeforeShowItem', this.self);
-                    this.self = this.self;
-                    this.$parent.$emit('ItemView', this);
-                    return this.self;
-                });
-            }
-        },
-        setShare (link) {
-            const encoded = encodeURIComponent(link);
-            const params = [
-                'intent:#Intent',
-                'action=android.intent.action.SEND',
-                'type=text/plain',
-                'S.android.intent.extra.TEXT=' + encoded,
-                'end'
-            ];
-            this.share = params.join(';'); 
-        },
-        setNav (uid, list) {
-            const keys = Object.keys(list);
-            const uidIndex = keys.indexOf(uid);
-            const prev = keys[uidIndex - 1];
-            const feed = this.feed ? this.feed : '_';
-            const path = `#/feeds/${this.category}/${feed}`;
-            if (prev) {
-                this.previous = `${path}/${prev}`; 
-            } else {
-                this.previous = null;
-            }
-            const next = keys[uidIndex + 1];
-            if (next){
-                this.next = `${path}/${next}`;
-            } else {
-                this.next = null;
-            }
-        },
-        onNav(code) {
-            if (this.$route.name === 'ReSSt.item'){
-                const LEFT = 37;
-                const RIGHT = 39;
-                const O = 79;
-                if(code === LEFT && this.previous) {
-                    this.$parent.$router.push({ path: this.previous.replace('#', '')});
-                } else if (code === RIGHT && this.next) {
-                    this.$parent.$router.push({ path: this.next.replace('#', '')});
-                } else if (this.self && code === O) {
-                    console.log(this.self);
-                    window.open(this.self.link, this.self.uid);
+                },
+                setBack () {
+                    const suffix = this.feed !== '_' ? `/${this.feed}` : '';
+                    set(this, 'backto', `#/feeds/${this.category}${suffix}`);
+                    return get(this, 'bakcto');
+                },
+                setNav () {
+                    const keys = Object.keys(this.items);
+                    const uidIndex = keys.indexOf(this.uid);
+                    const prev = keys[uidIndex - 1];
+                    const next = keys[uidIndex + 1];
+                    const path = `#/feeds/${this.category}/${this.feed}`;
+                    this.previous = prev ? `${path}/${prev}` : null;
+                    this.next = next ? `${path}/${next}`: null;
+                },
+                onNav(code) {
+                    const LEFT = 37;
+                    const RIGHT = 39;
+                    const O = 79;
+                    if(code === LEFT && this.previous) {
+                        this.$root.$router.push({ path: this.previous.replace('#', '')});
+                    } else if (code === RIGHT && this.next) {
+                        this.$root.$router.push({ path: this.next.replace('#', '')});
+                    } else if (this.self && code === O) {
+                        window.open(this.self.link, this.self.uid);
+                    }
+                },
+                registerEmbeder (embeder) {
+                    if (this.embedders.every(component => component.name !== embeder.name)){
+                        this.embedders.push(embeder);
+                    }
+                },
+                unregisterEmbeder (embeder) {
+                    this.embedders = this.embedders.filter(component => component.name !== embeder.name);
                 }
             }
-        },
-        registerEmbeder (embeder) {
-            if (this.embedders.every(component => component.name !== embeder.name)){
-                this.embedders.push(embeder);
-            }
-        },
-        unregisterEmbeder (embeder) {
-            this.embedders = this.embedders.filter(component => component.name !== embeder.name);
-        }
-    }
-});
+        };
+    });
