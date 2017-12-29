@@ -60,7 +60,7 @@ class Subscriptable:
 
 
 class By(Subscriptable):
-    _unread = lambda x, f: f & By.unread(x) if 'unread' in x else f
+    _unread = lambda x, f: f & By.unread(x) if x.get('unread') else f
     _day    = lambda x, f: f & By.date(x) if 'date' in x else f
     _un_day = lambda x, f: By._unread(x, By._day(x, f))
     key     = lambda x, key: Key(key).eq(x[key])
@@ -71,7 +71,7 @@ class By(Subscriptable):
     unread  = lambda x: By._day(x, Attr('unread_since').exists())
     read    = lambda x: By._day(x, Attr('readed_at').exists())
     star    = lambda x: By._day(x, Attr('stared').exists())
-    parent  = lambda x: By._un_day(x, Attr('parent').eq(x.get('parent') or ROOT))
+    parent  = lambda x: By._day(x, Attr('parent').eq(x.get('parent') or ROOT))
     title   = lambda x: By._un_day(x, Attr('title').contains(x['title']))
     link    = lambda x: By._un_day(x, Attr('link').eq(x['link']))
     text    = lambda x: By._un_day(x, Attr('text').contains(x['text']))
@@ -91,10 +91,9 @@ def list_params(conditions):
         else:
             yield condition
 
-def print_params(conditions):
+def print_params(conditions, index=None):
     try:
-        for val in list_params(conditions):
-            print(val)
+        print(index, list([val for val in list_params(conditions)]))
     except e:
         print(e)
 
@@ -113,6 +112,8 @@ def params(x, filex=None, key=None, last=None):
     if 'parent' in x:
         if key == 'parent' or not key:
             result['IndexName'] = PARENT_INDEX
+            if x.get('unread'):
+                result['IndexName'] = UNREAD_INDEX
         else:
             filex = filex or By.parent(x)
     if 'xmlUrl' in x or 'feeds' in x:
@@ -120,16 +121,15 @@ def params(x, filex=None, key=None, last=None):
             result['IndexName'] = FEEDS_INDEX
         else:
             filex = filex or By.xmlUrl(x)
-    if 'unread' in x:
-        if key == 'unread_since' or not key:
-            result['IndexName'] = UNREAD_INDEX
-        else:
-            filex = filex or (By.unread(x)| By.n_item(x))
+    if 'unread_since' in x:
+        filex = filex or (By.unread(x)| By.n_item(x))
     if result.get('KeyConditionExpression') and not x.get('sort'):
         result['ScanIndexForward'] = True
     if filex:
         result['FilterExpression'] = filex
-    print_params([result.get('KeyConditionExpression'), result.get('FilterExpression')])
+    print_params([result.get('KeyConditionExpression'),
+        result.get('FilterExpression')],
+        result.get('IndexName'))
     return result
 
 class ScanBy(Subscriptable):
@@ -148,7 +148,10 @@ class ScanBy(Subscriptable):
     @classmethod
     def _tree(cls, tree=ROOT, table=None, current_depth=0, max_depth=1, **data):
         data['parent'] = tree or ROOT
-        result = ScanBy.parent(data, table)
+        item_data = data.copy()
+        if current_depth != max_depth:
+            item_data['unread'] = False
+        result = ScanBy.parent(item_data, table)
         if current_depth < max_depth:
             del data['parent']
             for item in result['Items']:
@@ -158,14 +161,12 @@ class ScanBy(Subscriptable):
         return result
 
     @staticmethod
-    def get_by(unread=None, date=None, **data):
+    def get_by(date=None, **data):
         keys = data.keys()
         if keys:
             return ScanBy.get(next(iter(keys)))
         if date:
             return ScanBy.get('date')
-        if unread:
-            return ScanBy.get('unread')
         return ScanBy.get('parent')
 
 
@@ -247,9 +248,9 @@ class Operation(Subscriptable):
     @classmethod
     def _as_read(cls, table=None, uid=None, parentUid=None, uids=set(), unread=None, **data):
         readUpEx = '''REMOVE unread_since
-                  SET readed_at = if_not_exists(readed_at, :_now)'''
+            SET readed_at = if_not_exists(readed_at, :_now)'''
         unreadUpEx = '''REMOVE readed_at
-                  SET unread_since = if_not_exists(unread_since, :_now)'''
+            SET unread_since = if_not_exists(unread_since, :_now)'''
         upEx = unreadUpEx if unread else readUpEx
         values = {':_now': now()}
         def method(uid, parent):
