@@ -46,7 +46,7 @@ window.ReSSt.cat = window.ReSSt
                         this.current = items[0];
                         this.$store.commit('set_feedItems', { 
                             uid: this.uid,
-                            items: items.filter(i => i).reduce((r, v) => { r[v.uid] = v; return r; }, { })
+                            items: items.slice(0,100).filter(i => i).reduce((r, v) => { r[v.uid] = v; return r; }, { })
                         });
                         if (this.current) {
                             this.current.active = true;
