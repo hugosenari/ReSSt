@@ -23,8 +23,8 @@ window.ReSSt.item = window.ReSSt
                 cachedSelf () { return this.items[this.uid] || { uid: this.uid} }
             },
             created () {
-                this.$parent.$off('WindowKeyUp');
-                this.$parent.$on('WindowKeyUp', code => this.onNav(code));
+                this.$root.$off('WindowKeyUp');
+                this.$root.$on('WindowKeyUp', code => this.onNav(code));
                 this.$on('RegisterEmbeder', this.registerEmbeder);
                 this.$on('UnregisterEmbeder', this.unregisterEmbeder);
                 this.loadItem();
@@ -34,14 +34,14 @@ window.ReSSt.item = window.ReSSt
                 loadItem (...args) {
                     this.setBack();
                     this.setNav();
-                    this.$parent.$emit('BeforeShowItem', this.self);
                     this.self = this.cachedSelf;
                     if(!this.self.loaded){
                         return fetchData({ state : this.$store.state }, 'uid=' + this.uid).then(body => {
                             fetchData({ state : this.$store.state }, '', 'PATCH', { uid: this.uid });
                             if (this.self.uid === body.Items[0].uid) {
+                                this.$root.$emit('BeforeShowItem', body.Items[0]);
                                 this.self = Object.assign({}, this.self, body.Items[0], {loaded: true});
-                                this.$parent.$emit('ItemView', this);
+                                this.$root.$emit('ItemView', this);
                             }
                         });
                     }
@@ -65,9 +65,9 @@ window.ReSSt.item = window.ReSSt
                     const RIGHT = 39;
                     const O = 79;
                     if(code === LEFT && this.previous) {
-                        this.$parent.$router.push({ path: this.previous.replace('#', '')});
+                        this.$root.$router.push({ path: this.previous.replace('#', '')});
                     } else if (code === RIGHT && this.next) {
-                        this.$parent.$router.push({ path: this.next.replace('#', '')});
+                        this.$root.$router.push({ path: this.next.replace('#', '')});
                     } else if (this.self && code === O) {
                         window.open(this.self.link, this.self.uid);
                     }

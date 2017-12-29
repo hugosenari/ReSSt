@@ -18,8 +18,8 @@ window.ReSSt.cat = window.ReSSt
             },
             created () {
                 this.loadFeeds();
-                this.$parent.$off('WindowKeyUp');
-                this.$parent.$on('WindowKeyUp', code => {
+                this.$root.$off('WindowKeyUp');
+                this.$root.$on('WindowKeyUp', code => {
                     const LEFT = 37;
                     const RIGHT = 39;
                     const O = 79;
@@ -68,7 +68,7 @@ window.ReSSt.cat = window.ReSSt
                 },
                 markAsRead() {
                     if (this.current) {
-                        this.$parent.$options.methods.fetchData(
+                        fetchData({ state : this.$store.state },
                             '', 'PATCH', { uid: this.current.uid }
                         );
                         const old = this.current;

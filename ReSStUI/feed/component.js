@@ -19,8 +19,8 @@ window.ReSSt.feed = window.ReSSt
             },
             created() {
                 this.loadFeeds();
-                this.$parent.$off('WindowKeyUp');
-                this.$parent.$on('WindowKeyUp', code => {
+                this.$root.$off('WindowKeyUp');
+                this.$root.$on('WindowKeyUp', code => {
                     const LEFT = 37;
                     const RIGHT = 39;
                     const O = 79;
@@ -40,9 +40,9 @@ window.ReSSt.feed = window.ReSSt
                         .then(body => { this.self = body.Items[0]; });
                     const unread = get(this, 'showReaded') ? '' : '&unread=1';
                     const last = this.$route.query.last ? `&last=${this.$route.query.last.replace(/{*}*/g, '')}` : '';
-                    return fetchData( { state : this.$store.state }, `parent=${this.uid}${unread}${last}&sort=1`)
+                    return fetchData({ state : this.$store.state }, `parent=${this.uid}${unread}${last}&sort=1`)
                         .then(body => {
-                            const items = body.Items;
+                            const items = body.Items || [];
                             this.current = items[0];
                             if (this.current)  this.current.active = true;
                             this.nextPage = body.LastEvaluatedKey;
@@ -69,7 +69,7 @@ window.ReSSt.feed = window.ReSSt
                 },
                 markAsRead() {
                     if (this.current) {
-                        this.$parent.$options.methods.fetchData(
+                        fetchData({ state : this.$store.state },
                             '', 'PATCH', { uid: this.current.uid }
                         );
                         const old = this.current;

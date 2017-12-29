@@ -11,8 +11,8 @@
       if (enabled && item) {
         item.summary = replace(item.summary);
         if (item.content) {
-        for (const i of item.content.keys()) {
-          item.content[i] = replace(item.content[i]);
+          for (const i of item.content.keys()) {
+            item.content[i] = replace(item.content[i]);
           }
         }
       }
