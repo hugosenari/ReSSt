@@ -36,7 +36,6 @@ const loadComponent = (name, path = '', namespace = ReSSt) => {
     return () => promise;
 };
 
-
 const route = ({name, path}) => ({
     name: 'ReSSt.' + name,
     path: path || '/' + name,
@@ -54,7 +53,13 @@ const routes = componentNames.map(name => route({ name }))
 const save = (key, val) => localStorage.setItem(key, val);
 const saveString = (key, val) => save(key, JSON.stringify(val));
 const read = (key, or = '') => localStorage.getItem(key) || or;
-const readObj = (key, or = '{}') => JSON.parse(read(key, or));
+const readObj = (key, or = '{}') => {
+    try {
+        return JSON.parse(read(key, or) || or);
+    } catch (e) {
+        console.log(e, read(key, or));
+    }
+}
 const setter = (obj, key, val) => { save(key, val); obj[key] = val; };
 const setterObj = (obj, key, val) => { saveString(key, val); obj[key] = val; };
 const fetchData = ({ state, mode = 'cors', cache = 'default'}, params='', method='GET', body=null ) => {
@@ -129,7 +134,6 @@ const Store = {
     }
 };
 
-
 const App = {
     el: '#app',
     data () {
@@ -150,40 +154,6 @@ const App = {
     components: {
         'resstplugins':  loadComponent('plugin')
     } ,
-    methods: {
-        fetchData (params='', method='GET', body=null) {
-            const key = localStorage.getItem('key');
-            const endpoint = localStorage.getItem('endpoint');
-            const headers = new Headers();
-            headers.append('x-api-key', key);
-            headers.append('Content-Type', 'application/json');
-            const options = {
-                method: method,
-                headers,
-                mode: 'cors',
-                cache: 'default'
-            };
-            if (body) {
-                options.body = JSON.stringify(body);
-            }
-            return fetch(endpoint + '/ReSStCRUD?' + params, options)
-            .then(
-                (response) => {
-                    return response.json();
-                }
-            );
-        },
-        getList() { return ReSSt.data.list; },
-        setList(values=[]) {
-            ReSSt.data.list = {};
-            values.filter(i => !!i)
-            for (const item of values.filter(i => !!i)) {
-                item.active = false;
-                ReSSt.data.list[item.uid] = item;
-            }
-            return ReSSt.data.list;
-        }
-    }
 };
 
 const routeLogic = (to, fron, next) => {
@@ -204,7 +174,4 @@ waitVue('VueRouter', 'VueMaterial')
 
 window.ReSSt = ReSSt;
 window.ReSSt.lib = lib;
-window.ReSSt.loadComponent = loadComponent;
-window.ReSSt.loaded = loaded;
 window.ReSSt.mapState = mapState;
-window.ReSSt.fetchData = fetchData;
