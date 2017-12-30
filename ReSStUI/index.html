@@ -1,41 +1,64 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
-        <meta charset="UTF-8">
-        <title>ReSStUI</title>
-        <link rel="stylesheet" href="style.css">
-    </head>
-    <body>
-        <div id="app">
-            <md-toolbar class="md-dense">
-                <md-button :href="backto" v-if="backto" 
-                    class="md-icon-button" aria-label="Back">
-                    <md-icon>arrow_back</md-icon>
-                </md-button>
-                
-                <router-link to="/" class="md-title" style="flex: 1" tag="h2">
-                    ReSStUI
-                </router-link>
-                
-                <router-link tag="md-button" to="/settings"
-                    class="md-icon-button" aria-label="Settings">
-                    <md-icon>settings</md-icon>
-                </router-link>
-            </md-toolbar>
-            <div class="main-content">
-                <transition :name="transitionName">
-                    <router-view></router-view>
-                </transition>
-            </div>
-            <resstplugins></resstplugins>
+
+<head>
+    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+    <meta charset="UTF-8">
+    <title>ReSStUI</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="dns-prefetch" href="unpkg.com"/>
+    <link rel="dns-prefetch" href="fonts.googleapis.com"/>
+    <link rel="stylesheet" href="//unpkg.com/vue-material@0.7.5/dist/vue-material.css" />
+</head>
+
+<body>
+    <div id="app">
+        <md-toolbar class="md-dense">
+            <md-button :href="backto" v-if="backto" class="md-icon-button" aria-label="Back">
+                <md-icon>arrow_back</md-icon>
+            </md-button>
+
+            <router-link to="/" class="md-title" style="flex: 1" tag="h2">
+                ReSStUI
+            </router-link>
+
+            <router-link tag="md-button" to="/settings" class="md-icon-button" aria-label="Settings">
+                <md-icon>settings</md-icon>
+            </router-link>
+        </md-toolbar>
+        <div class="main-content">
+            <transition :name="transitionName">
+                <router-view></router-view>
+            </transition>
         </div>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/vue/2.5.9/vue.min.js"></script>
-        <script async src="//unpkg.com/vue-router@3.0.1/dist/vue-router.min.js"></script>
-        <script async src="//cdnjs.cloudflare.com/ajax/libs/vuex/3.0.1/vuex.min.js"></script>
-        <link rel="stylesheet" href="//unpkg.com/vue-material@0.7.5/dist/vue-material.css"/>
-        <script async src="//unpkg.com/vue-material@0.7.5/dist/vue-material.js"></script>
-        <script async src="index.js"></script>
-        <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons"/>
-    </body>
+        <resstplugins></resstplugins>
+    </div>
+    <script async>
+        (()=> {
+            const DEBUG = window.location.toString().includes('debug=1');
+            const loadLibFromCache = path => {
+                const text = localStorage.getItem(path);
+                if (!DEBUG && text) return Promise.resolve(text);
+                const headers = new Headers();
+                headers.append('Content-Type', 'application/javascript');
+                const options = { method: 'GET', headers, mode: 'cors', cache: 'default' };
+                return fetch(path, options).then(response => response.text()).then(text => {
+                    localStorage.setItem(path, text);
+                    return text;
+                });
+            };
+            Promise.all(
+                [
+                    loadLibFromCache('//unpkg.com/vue@2.5.13/dist/vue.min.js'),
+                    loadLibFromCache('//unpkg.com/vue-router@3.0.1/dist/vue-router.min.js'),
+                    loadLibFromCache('//unpkg.com/vue-material@0.7.5/dist/vue-material.js'),
+                    loadLibFromCache('//unpkg.com/vuex@3.0.1/dist/vuex.min.js')
+                ]
+            ).then(jss => {for(const js of jss) {eval(js);}});
+        })();
+    </script>
+    <script async src="index.js"></script>
+    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons" />
+</body>
+
 </html>
