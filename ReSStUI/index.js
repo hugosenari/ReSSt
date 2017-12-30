@@ -32,7 +32,8 @@
         const tp = loadComponentFromCache(`${path}${name}/component.html`);
         const js = loadComponentFromCache(`${path}${name}/component.js`)
             .then(js => {
-                eval(js);
+                try { eval(js); }
+                catch (e) { console.log(`loading component error ${name}`, e); }
                 const component = namespace[name];
                 const error = new Error("Can't load component " + name);
                 return component || Promise.reject(error);

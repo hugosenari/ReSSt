@@ -8,7 +8,7 @@ window.ReSSt.plugin = window.ReSSt
             this.loadPlugins();
         },
         methods: {
-            getPlugins() { return get(this, 'plugins'); },
+            getPlugins() { return get('plugins') || {}; },
             addScript(name, src) {
                 const body = document.getElementsByTagName('body')[0];
                 let script = document.getElementById('plugins_' + name);
