@@ -21,7 +21,7 @@ window.ReSSt.plugin = window.ReSSt
                 }
             },
             setPlugins(plugins) {
-                set(this, 'plugins', plugins)
+                set('plugins', plugins)
                 for (const name of Object.keys(plugins)) {
                     this.addScript(name, plugins[name].address);
                 }

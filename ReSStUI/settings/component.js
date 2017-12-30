@@ -8,8 +8,8 @@ window.ReSSt.settings = window.ReSSt
         'settings-plugins' : () => loadComponent('plugins', 'settings/', window.ReSSt.settings)()
     },
     created () {
-        if (!get(this, 'backto')) {
-            set(this, 'backto', '#/feeds');
+        if (!get('backto')) {
+            set('backto', '#/feeds');
         }
     }
 }));

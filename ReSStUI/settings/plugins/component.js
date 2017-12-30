@@ -2,7 +2,7 @@
 
 window.ReSSt.settings.plugins = window.ReSSt
     .mapState('pluginsAutoPlay', 'plugins')
-    .then(({ pluginsAutoPlay, plugins, set, get }) => {
+    .then(({ pluginsAutoPlay, plugins }) => {
         return {
             computed: { plugins, pluginsAutoPlay },
             data () {

@@ -2,7 +2,7 @@
 
 window.ReSSt.item = window.ReSSt
     .mapState('feeds', 'backto')
-    .then(({get, set, fetchData}) => {
+    .then(({get, set, fetch}) => {
         return {
             data () {
                 return {
@@ -18,7 +18,7 @@ window.ReSSt.item = window.ReSSt
                 feed () { return this.$route.params.feed; },
                 category () { return this.$route.params.category; },
                 parentUid () { return this.feed != '_' ? this.feed : this.category; },
-                allItems () { return get(this, 'feeds') || {}; },
+                allItems () { return get('feeds') || {}; },
                 items () { return this.allItems[this.parentUid] || {}; },
                 cachedSelf () { return this.items[this.uid] || { uid: this.uid} }
             },
@@ -36,8 +36,8 @@ window.ReSSt.item = window.ReSSt
                     this.setNav();
                     this.self = this.cachedSelf;
                     if(!this.self.loaded){
-                        return fetchData({ state : this.$store.state }, 'uid=' + this.uid).then(body => {
-                            fetchData({ state : this.$store.state }, '', 'PATCH', { uid: this.uid });
+                        return fetch('uid=' + this.uid).then(body => {
+                            fetch('', 'PATCH', { uid: this.uid });
                             if (this.self.uid === body.Items[0].uid) {
                                 this.$root.$emit('BeforeShowItem', body.Items[0]);
                                 this.self = Object.assign({}, this.self, body.Items[0], {loaded: true});
@@ -48,8 +48,8 @@ window.ReSSt.item = window.ReSSt
                 },
                 setBack () {
                     const suffix = this.feed !== '_' ? `/${this.feed}` : '';
-                    set(this, 'backto', `#/feeds/${this.category}${suffix}`);
-                    return get(this, 'bakcto');
+                    set('backto', `#/feeds/${this.category}${suffix}`);
+                    return get('bakcto');
                 },
                 setNav () {
                     const keys = Object.keys(this.items);
