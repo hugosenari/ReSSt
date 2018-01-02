@@ -21,10 +21,12 @@
     
     const waitVue = (...names) => loaded('Vue').then(Vue => vueUse(Vue, ...names));
     const loadComponentFromCache = path => {
-        const text = localStorage.getItem(path);
+        const components = JSON.parse(localStorage.getItem('components') || '{}');
+        const text = components[path];
         if (!DEBUG && text) return Promise.resolve(text);
         return fetch(path).then(response => response.text()).then(text => {
-            localStorage.setItem(path, text);
+            components[path] = text;
+            localStorage.setItem('components', JSON.stringify(components));
             return text;
         });
     };
@@ -69,8 +71,8 @@
             console.log(e, read(key, or));
         }
     }
-    const setter = (obj, key, val) => { save(key, val); obj[key] = val; };
-    const setterObj = (obj, key, val) => { saveString(key, val); obj[key] = val; };
+    const setter = (obj, key, val) => { Vue.set(obj, key, val); save(key, val); };
+    const setterObj = (obj, key, val) => { Vue.set(obj, key, val); saveString(key, val);};
     const fetchData = ({ state, mode = 'cors', cache = 'default'}, params='', method='GET', body=null ) => {
         const { key, endpoint } = state || ReSSt.App.$store.state;
         const headers = new Headers();
@@ -131,9 +133,9 @@
             set_plugins: (state, plugins) => setterObj(state, 'plugins', plugins),
             set_pluginsAutoPlay: (state) => setter(state, 'pluginsAutoPlay', !state.pluginsAutoPlay),
             set_feedItems: (state, { uid, items }) => {
-                state.feeds[uid] = items;
-                state.feeds = state.feeds;
-                saveString('feeds', state.feeds);
+                const feeds = state.feeds || {};
+                Vue.set(feeds, uid, items);
+                setterObj(state, 'feeds', feeds);
             },
             set_categories: (state, categories) => setterObj(state, 'categories', categories)
         },
