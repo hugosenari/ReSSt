@@ -14,7 +14,12 @@ window.ReSSt.feed = window.ReSSt
             },
             computed: {
                 uid () { return this.$route.params.feed; },
-                myItems () { return ((get('feeds') || {})[this.uid] || {}); },
+                myItems () {
+                    const feeds = get('feeds') || {};
+                    const items = feeds[this.uid] || {};
+                    this.$store.commit('set_feedItems', { uid: this.uid, items });
+                    return get('feeds')[this.uid];
+                },
                 keys () { return Object.keys((get('feeds') || {})[this.uid] || {}); },
                 currentKey () { return Object.keys((get('feeds') || {})[this.uid] || {})[this.selected]; },
                 current () { return this.myItems[this.currentKey]; },
