@@ -35,12 +35,14 @@
         (()=> {
             const VERSION = 0.001;
             window.APP_VERSION  = VERSION;
+            window.APP_START_TIME = new Date().getTime();
             const DEBUG = window.location.toString().includes('debug=1');
+            if (DEBUG) localStorage.setItem('version', new Date().getTime());
             const updated = localStorage.getItem('version') == VERSION;
             const loadCodeFromCache = path => {
                 localStorage.setItem('version', VERSION);
                 const text = localStorage.getItem(path);
-                if (!DEBUG && text && updated) return Promise.resolve({ path, text });
+                if (text && updated) return Promise.resolve({ path, text });
                 return fetch(path).then(response => response.text()).then(text => {
                     localStorage.setItem(path, text);
                     return { path, text };
@@ -63,7 +65,7 @@
                     loadCodeFromCache('//cdn.jsdelivr.net/npm/vue-material@0.8.1/dist/vue-material.min.css'),
                     loadCodeFromCache('style.css')
                 ]
-            ).then(styles => styles.forEach(loadStyle), (e)=> console.log('eita', e));
+            ).then(styles => styles.forEach(loadStyle));
             Promise.all(
                 [
                     loadCodeFromCache('//unpkg.com/vue@2.5.13/dist/vue.min.js'),
