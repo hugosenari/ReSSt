@@ -25,7 +25,7 @@ window.ReSSt.plugin = window.ReSSt
             setPlugin(name, plugin) {
                 const plugins = this.getPlugins();
                 plugins[name] = plugin;
-                this.addScript(name, plugin.address)
+                this.setPlugins(plugins);
                 return plugins;
             },
             removePlugin(name) {
