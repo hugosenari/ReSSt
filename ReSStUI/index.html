@@ -33,18 +33,26 @@
     </div>
     <script async>
         (()=> {
-            const VERSION = 0.002;
+            const VERSION = 0.0001;
             window.APP_VERSION  = VERSION;
-            window.APP_START_TIME = new Date().getTime();
+            window.APP_START_TIME = '';
+            const START_TIME = new Date().getTime();
             const DEBUG = window.location.toString().includes('debug=1');
             if (DEBUG) localStorage.setItem('version', new Date().getTime());
             const updated = localStorage.getItem('version') == VERSION;
+            const appendTime = src => {
+                window.APP_START_TIME = `${window.APP_START_TIME}\n${new Date().getTime() - START_TIME}: ${src.path}`;
+            };
             const loadCodeFromCache = path => {
                 localStorage.setItem('version', VERSION);
                 const text = localStorage.getItem(path);
-                if (text && updated) return Promise.resolve({ path, text });
+                if (text && updated) {
+                    appendTime({ path, text });
+                    return Promise.resolve({ path, text });
+                }
                 return fetch(path).then(response => response.text()).then(text => {
                     localStorage.setItem(path, text);
+                    appendTime({ path, text });
                     return { path, text };
                 });
             };
