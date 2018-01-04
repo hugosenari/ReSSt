@@ -130,6 +130,8 @@ def params(x, filex=None, key=None, last=None):
     print_params([result.get('KeyConditionExpression'),
         result.get('FilterExpression')],
         result.get('IndexName'))
+    if 'Limit' in x:
+        result['Limit']=int(x['Limit'])
     return result
 
 class ScanBy(Subscriptable):

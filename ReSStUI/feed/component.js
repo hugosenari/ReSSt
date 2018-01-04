@@ -48,7 +48,7 @@ window.ReSSt.feed = window.ReSSt
                     const unread = get('showReaded') ? '' : '&unread=1';
                     const query = this.$route.query; 
                     const last = query.last ? `&last=${query.last.replace(/{*}*/g, '')}` : '';
-                    return fetch(`parent=${this.uid}${unread}${last}&sort=1`)
+                    return fetch(`parent=${this.uid}${unread}${last}&sort=1&Limit=40`)
                         .then(body => {
                             const items = (body.Items || [])
                                 .filter(i => i)

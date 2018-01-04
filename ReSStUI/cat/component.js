@@ -46,7 +46,7 @@ window.ReSSt.cat = window.ReSSt
                     set('backto', '#/feeds');
                     fetch(`uid=${this.uid}`).then(body => { this.self = body.Items[0]; });
                     const unread = get('showReaded') ? '' : '&unread=1';
-                    fetch(`tree=${this.uid}${unread}`).then(body => {
+                    fetch(`tree=${this.uid}${unread}&Limit=40`).then(body => {
                         const items = (body.Items || [])
                             .reduce((r, v) => r.concat(v.Items || []), [])
                             .filter(i => i)
