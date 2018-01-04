@@ -2,17 +2,19 @@
 (()=>{
     const DEBUG = window.location.toString().includes('debug=1');
     const ReSSt = { data: {} };
+    window.ReSSt = ReSSt;
     const ROOT = '/';
+    const loadingModules = {};
     const loaded = (name) => new Promise(resolve => {
         const hasRessource = () => window[name] ?
             resolve(window[name]) :
-            setTimeout(hasRessource, 10);
+            setTimeout(hasRessource, 30);
         hasRessource();
     });
     const vueUse = (Vue, ...names) => {
         const results = [Vue];
         for (const name of names) {
-            const result = loaded(name).then(o => {  Vue.use(o); return o; });
+            const result = loaded(name).then(o => { Vue.use(o); return o; });
             results.push(result);
         }
         return Promise.all(results);
@@ -23,11 +25,8 @@
         const tp = loadCodeFromCache(`${path}${name}/component.html`);
         const js = loadCodeFromCache(`${path}${name}/component.js`)
             .then((js) => {
-                try { eval(js.text); }
-                catch (e) { console.log(`loading component error: ${name}`, e); }
-                const component = namespace[name];
-                const error = new Error("Can't load component: " + name);
-                return component || Promise.reject(error);
+                window.evaluate(js);
+                return namespace[name];
             });
         const promise = Promise.all([tp, js]).then(([template, component]) => {
             component.template = template.text;
@@ -35,21 +34,6 @@
         });
         return () => promise;
     };
-    
-    const route = ({name, path}) => ({
-        name: 'ReSSt.' + name,
-        path: path || '/' + name,
-        component: loadComponent(name)
-    });
-    const componentNames = ['settings', 'feeds'];
-    const routes = componentNames.map(name => route({ name }))
-        .concat([
-            route({ name: 'home', path: '/' }),
-            route({ name: 'cat',  path: '/feeds/:category'}),
-            route({ name: 'feed', path: '/feeds/:category/:feed'}),
-            route({ name: 'item', path: '/feeds/:category/:feed/:item'})
-        ]);
-    
     const save = (key, val) => localStorage.setItem(key, val);
     const saveString = (key, val) => save(key, JSON.stringify(val));
     const read = (key, or = '') => localStorage.getItem(key) || or;
@@ -103,7 +87,8 @@
         l.get = (attr) => l.app().$store.state[attr];
         return l;
     });
-    
+    window.ReSSt.lib = lib;
+    window.ReSSt.mapState = mapState;    
     const Store = {
         state: {
             endpoint: read('endpoint'),
@@ -137,7 +122,19 @@
             }
         }
     };
-    
+    const route = ({name, path}) => ({
+        name: 'ReSSt.' + name,
+        path: path || '/' + name,
+        component: loadComponent(name)
+    });
+    const componentNames = ['settings', 'feeds'];
+    const routes = componentNames.map(name => route({ name }))
+        .concat([
+            route({ name: 'home', path: '/' }),
+            route({ name: 'cat',  path: '/feeds/:category'}),
+            route({ name: 'feed', path: '/feeds/:category/:feed'}),
+            route({ name: 'item', path: '/feeds/:category/:feed/:item'})
+        ]);
     const App = {
         el: '#app',
         data () {
@@ -175,8 +172,4 @@
             App.router.beforeEach(routeLogic);
             ReSSt.App = new Vue(App);
         });
-    
-    window.ReSSt = ReSSt;
-    window.ReSSt.lib = lib;
-    window.ReSSt.mapState = mapState;
 })()

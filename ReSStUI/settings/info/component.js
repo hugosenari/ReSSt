@@ -5,12 +5,12 @@ window.ReSSt.settings.info = window.ReSSt
         { 
             data () {
                 return {
-                    time_to_run: window.APP_START_TIME || ''
+                    times_to_run: window.APP_START_TIMES || {}
                 };
             },
             created () {
                 setTimeout(()=> {
-                    this.time_to_run = window.APP_START_TIME;
+                    times_to_run = window.APP_START_TIMES;
                 }, 5000);
             }
         }

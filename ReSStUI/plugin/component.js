@@ -12,13 +12,8 @@ window.ReSSt.plugin = window.ReSSt
             getPlugins() { return get('plugins') || {}; },
             addScript(name, src) {
                 if (pluginsLoaded[src]) return true;
-                loadCodeFromCache(src).then(js => {
-                    try {
-                        eval(js.text);
-                        pluginsLoaded[src] = true;
-                    } catch (e) {
-                        console.log(name, e);
-                    }});
+                pluginsLoaded[src] = true;
+                loadCodeFromCache(src).then(js => window.evaluate(js));
             },
             setPlugins(plugins) {
                 set('plugins', plugins)
@@ -88,7 +83,6 @@ window.ReSSt.plugin = window.ReSSt
             }
         }
     }
-
 });
 
 window.ReSSt.plugin.embedComponent = opts => {

@@ -35,54 +35,74 @@
         (()=> {
             const VERSION = 0.0001;
             window.APP_VERSION  = VERSION;
-            window.APP_START_TIME = '';
-            const START_TIME = new Date().getTime();
+            window.START_TIME = new Date().getTime();
+            window.APP_START_TIME = '' ;
             const DEBUG = window.location.toString().includes('debug=1');
             if (DEBUG) localStorage.setItem('version', new Date().getTime());
             const updated = localStorage.getItem('version') == VERSION;
-            const appendTime = src => {
-                window.APP_START_TIME = `${window.APP_START_TIME}\n${new Date().getTime() - START_TIME}: ${src.path}`;
+            const APP_START_TIMES = {};
+            window.APP_START_TIMES = APP_START_TIMES;
+            const appendTime = (src, type = '') => {
+                const elapsedTime = new Date().getTime() - START_TIME;
+                APP_START_TIMES[src.path] = APP_START_TIMES[src.path] || {
+                    download_begin: 0, download_end: 0, eval_begin: 0, eval_end: 0
+                };
+                APP_START_TIMES[src.path][type] = elapsedTime;
             };
             const loadCodeFromCache = path => {
+                appendTime({ path }, 'download_begin');
                 localStorage.setItem('version', VERSION);
                 const text = localStorage.getItem(path);
                 if (text && updated) {
-                    appendTime({ path, text });
+                    appendTime({ path, text }, 'download_end');
                     return Promise.resolve({ path, text });
                 }
                 return fetch(path).then(response => response.text()).then(text => {
                     localStorage.setItem(path, text);
-                    appendTime({ path, text });
+                    appendTime({ path, text }, 'download_end');
                     return { path, text };
                 });
             };
             window.loadCodeFromCache = loadCodeFromCache;
+
             const evaluate = js => {
-                try {eval(js.text);}
-                catch (e) {console.log(js.path, js.text, e);}
+                try {
+                    if (js.text){
+                        appendTime(js, 'eval_begin');
+                        const result = eval(js.text);
+                        appendTime(js, 'eval_end');
+                        return result;
+                    }
+                } catch (e) {console.log(js.path, js.text, e);}
             };
+            window.evaluate = evaluate;
+            loadCodeFromCache('index.js').then(evaluate);
+            loadCodeFromCache('//unpkg.com/vue@2.5.13/dist/vue.min.js')
+                .then((js) => {
+                    evaluate(js);
+                    loadCodeFromCache('//unpkg.com/vuex@3.0.1/dist/vuex.min.js')
+                        .then(evaluate);
+                    loadCodeFromCache('//unpkg.com/vue-router@3.0.1/dist/vue-router.min.js')
+                        .then(evaluate);
+                    loadCodeFromCache('//cdn.jsdelivr.net/npm/vue-material@0.8.1/dist/vue-material.min.js')
+                        .then(evaluate);
+                });
+            
             const loadStyle = style => {
+                appendTime(style, 'eval_begin');
                 const element = document.createElement("style");
                 element.setAttribute("type", "text/css");
                 element.textContent = style.text.replace('sourceMappingURL=', '');
                 document.getElementsByTagName("head")[0].appendChild(element);
+                appendTime(style, 'eval_end');
             };
-            Promise.all(
-                [
-                    loadCodeFromCache('//fonts.googleapis.com/icon?family=Material+Icons'),
-                    loadCodeFromCache('//cdn.jsdelivr.net/npm/vue-material@0.8.1/dist/vue-material.min.css'),
-                    loadCodeFromCache('style.css')
-                ]
-            ).then(styles => styles.forEach(loadStyle));
-            Promise.all(
-                [
-                    loadCodeFromCache('//unpkg.com/vue@2.5.13/dist/vue.min.js'),
-                    loadCodeFromCache('//unpkg.com/vuex@3.0.1/dist/vuex.min.js'),
-                    loadCodeFromCache('//unpkg.com/vue-router@3.0.1/dist/vue-router.min.js'),
-                    loadCodeFromCache('//cdn.jsdelivr.net/npm/vue-material@0.8.1/dist/vue-material.min.js'),
-                    loadCodeFromCache('index.js')
-                ]
-            ).then(jss => jss.forEach(evaluate));
+            loadCodeFromCache('//fonts.googleapis.com/icon?family=Material+Icons')
+                .then(loadStyle);
+            loadCodeFromCache('//cdn.jsdelivr.net/npm/vue-material@0.8.1/dist/vue-material.min.css')
+                .then(loadStyle);
+            loadCodeFromCache('style.css')
+                .then(loadStyle);
+
         })();
     </script>
 </body>

@@ -1,6 +1,33 @@
 <md-tab id="info" md-label="Info">
     <p>Loading Time (ms)</p>
-    <pre>
-        {{time_to_run}}
-    </pre>
+    <md-table>
+        <md-table-header>
+            <md-table-row>
+                <md-table-head>Path</md-table-head>
+                <md-table-head md-numeric md-tooltip="Download started at"><md-icon>file_download</md-icon><md-icon>hourglass_empty</md-icon></md-table-head>
+                <md-table-head md-numeric md-tooltip="Download done after"><md-icon>file_download</md-icon><md-icon>hourglass_full</md-icon></md-table-head>
+                <md-table-head md-numeric md-tooltip="Evaluation started at"><md-icon>play_arrow</md-icon><md-icon>hourglass_empty</md-icon></md-table-head>
+                <md-table-head md-numeric md-tooltip="Evaluation done after"><md-icon>play_arrow</md-icon><md-icon>hourglass_full</md-icon></md-table-head>
+            </md-table-row>
+        </md-table-header>
+        <md-table-body>
+            <md-table-row v-for="(value, key) in times_to_run" :key="key">
+                <md-table-cell>
+                    {{key}}
+                </md-table-cell>
+                <md-table-cell md-numeric>
+                    {{value.download_begin}}
+                </md-table-cell>
+                <md-table-cell md-numeric>
+                    {{value.download_end}}(+{{value.download_end - value.download_begin}})
+                </md-table-cell>
+                <md-table-cell md-numeric>
+                    {{value.eval_begin}}
+                </md-table-cell>
+                <md-table-cell md-numeric>
+                    {{value.eval_end}}(+{{value.eval_end - value.eval_begin}})
+                </md-table-cell>
+            </md-table-row>
+        </md-table-body>
+    </md-table>
 </md-tab>
