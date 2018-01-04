@@ -5,10 +5,8 @@
     <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
     <meta charset="UTF-8">
     <title>ReSStUI</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="dns-prefetch" href="unpkg.com"/>
     <link rel="dns-prefetch" href="fonts.googleapis.com"/>
-    <link rel="stylesheet" href="//unpkg.com/vue-material@0.7.5/dist/vue-material.css" />
 </head>
 
 <body>
@@ -35,30 +33,48 @@
     </div>
     <script async>
         (()=> {
+            const VERSION = 0.001;
+            window.APP_VERSION  = VERSION;
             const DEBUG = window.location.toString().includes('debug=1');
-            const loadLibFromCache = path => {
+            const updated = localStorage.getItem('version') == VERSION;
+            const loadCodeFromCache = path => {
+                localStorage.setItem('version', VERSION);
                 const text = localStorage.getItem(path);
-                if (!DEBUG && text) return Promise.resolve(text);
-                const headers = new Headers();
-                headers.append('Content-Type', 'application/javascript');
-                const options = { method: 'GET', headers, mode: 'cors', cache: 'default' };
-                return fetch(path, options).then(response => response.text()).then(text => {
+                if (!DEBUG && text && updated) return Promise.resolve({ path, text });
+                return fetch(path).then(response => response.text()).then(text => {
                     localStorage.setItem(path, text);
-                    return text;
+                    return { path, text };
                 });
+            };
+            window.loadCodeFromCache = loadCodeFromCache;
+            const evaluate = js => {
+                try {eval(js.text);}
+                catch (e) {console.log(js.path, js.text, e);}
+            };
+            const loadStyle = style => {
+                const element = document.createElement("style");
+                element.setAttribute("type", "text/css");
+                element.textContent = style.text.replace('sourceMappingURL=', '');
+                document.getElementsByTagName("head")[0].appendChild(element);
             };
             Promise.all(
                 [
-                    loadLibFromCache('//unpkg.com/vue@2.5.13/dist/vue.min.js'),
-                    loadLibFromCache('//unpkg.com/vue-router@3.0.1/dist/vue-router.min.js'),
-                    loadLibFromCache('//unpkg.com/vue-material@0.7.5/dist/vue-material.js'),
-                    loadLibFromCache('//unpkg.com/vuex@3.0.1/dist/vuex.min.js')
+                    loadCodeFromCache('//fonts.googleapis.com/icon?family=Material+Icons'),
+                    loadCodeFromCache('//cdn.jsdelivr.net/npm/vue-material@0.8.1/dist/vue-material.min.css'),
+                    loadCodeFromCache('style.css')
                 ]
-            ).then(jss => {for(const js of jss) {eval(js);}});
+            ).then(styles => styles.forEach(loadStyle), (e)=> console.log('eita', e));
+            Promise.all(
+                [
+                    loadCodeFromCache('//unpkg.com/vue@2.5.13/dist/vue.min.js'),
+                    loadCodeFromCache('//unpkg.com/vuex@3.0.1/dist/vuex.min.js'),
+                    loadCodeFromCache('//unpkg.com/vue-router@3.0.1/dist/vue-router.min.js'),
+                    loadCodeFromCache('//cdn.jsdelivr.net/npm/vue-material@0.8.1/dist/vue-material.min.js'),
+                    loadCodeFromCache('index.js')
+                ]
+            ).then(jss => jss.forEach(evaluate));
         })();
     </script>
-    <script async src="index.js"></script>
-    <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons" />
 </body>
 
 </html>

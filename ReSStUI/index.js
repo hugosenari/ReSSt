@@ -12,36 +12,26 @@
     const vueUse = (Vue, ...names) => {
         const results = [Vue];
         for (const name of names) {
-            const result = loaded(name)
-                .then(o => { Vue.use(o); return o; });
+            const result = loaded(name).then(o => {  Vue.use(o); return o; });
             results.push(result);
         }
         return Promise.all(results);
     };
     
     const waitVue = (...names) => loaded('Vue').then(Vue => vueUse(Vue, ...names));
-    const loadComponentFromCache = path => {
-        const components = JSON.parse(localStorage.getItem('components') || '{}');
-        const text = components[path];
-        if (!DEBUG && text) return Promise.resolve(text);
-        return fetch(path).then(response => response.text()).then(text => {
-            components[path] = text;
-            localStorage.setItem('components', JSON.stringify(components));
-            return text;
-        });
-    };
+    const loadCodeFromCache = window.loadCodeFromCache;
     const loadComponent = (name, path = '', namespace = ReSSt) => {
-        const tp = loadComponentFromCache(`${path}${name}/component.html`);
-        const js = loadComponentFromCache(`${path}${name}/component.js`)
-            .then(js => {
-                try { eval(js); }
-                catch (e) { console.log(`loading component error ${name}`, e); }
+        const tp = loadCodeFromCache(`${path}${name}/component.html`);
+        const js = loadCodeFromCache(`${path}${name}/component.js`)
+            .then((js) => {
+                try { eval(js.text); }
+                catch (e) { console.log(`loading component error: ${name}`, e); }
                 const component = namespace[name];
-                const error = new Error("Can't load component " + name);
+                const error = new Error("Can't load component: " + name);
                 return component || Promise.reject(error);
             });
         const promise = Promise.all([tp, js]).then(([template, component]) => {
-            component.template = template;
+            component.template = template.text;
             return component;
         });
         return () => promise;
@@ -93,6 +83,7 @@
                 obj.Vue = Vue;
                 obj.Vuex = Vuex;
                 obj.app = () => ReSSt.App;
+                obj.loadCodeFromCache = loadCodeFromCache;
                 obj.loadComponent = loadComponent;
                 obj.fetchData = fetchData;
                 obj.fetch = (params='', method='GET', body=null, opts={}) => 
@@ -189,5 +180,4 @@
     window.ReSSt = ReSSt;
     window.ReSSt.lib = lib;
     window.ReSSt.mapState = mapState;
-    
 })()

@@ -2,7 +2,8 @@
 
 window.ReSSt.plugin = window.ReSSt
 .mapState('pluginsAutoPlay', 'plugins')
-.then(({ pluginsAutoPlay, plugins, set, get }) => {
+.then(({ pluginsAutoPlay, loadCodeFromCache, plugins, set, get }) => {
+    const pluginsLoaded = {};
     return {
         created () {
             this.loadPlugins();
@@ -10,15 +11,14 @@ window.ReSSt.plugin = window.ReSSt
         methods: {
             getPlugins() { return get('plugins') || {}; },
             addScript(name, src) {
-                const body = document.getElementsByTagName('body')[0];
-                let script = document.getElementById('plugins_' + name);
-                if (!script) {
-                    script = document.createElement('script');
-                    script.type = 'text/javascript';
-                    script.src = src;
-                    script.id = 'plugins_' + name;
-                    body.appendChild(script);
-                }
+                if (pluginsLoaded[src]) return true;
+                loadCodeFromCache(src).then(js => {
+                    try {
+                        eval(js.text);
+                        pluginsLoaded[src] = true;
+                    } catch (e) {
+                        console.log(name, e);
+                    }});
             },
             setPlugins(plugins) {
                 set('plugins', plugins)
@@ -30,7 +30,8 @@ window.ReSSt.plugin = window.ReSSt
             setPlugin(name, plugin) {
                 const plugins = this.getPlugins();
                 plugins[name] = plugin;
-                return this.setPlugins(plugins);
+                this.addScript(name, plugin.address)
+                return plugins;
             },
             removePlugin(name) {
                 this.$root.$emit('PluginDisabled', name);
