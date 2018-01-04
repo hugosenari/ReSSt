@@ -49,7 +49,7 @@
     const fetchData = ({ state, mode = 'cors', cache = 'default'}, params='', method='GET', body=null ) => {
         const { key, endpoint } = state || ReSSt.App.$store.state;
         const headers = new Headers();
-        headers.append('x-api-key', key);
+        headers.append('X-Api-Key', key);
         headers.append('Content-Type', 'application/json');
         const options = { method, headers, mode, cache };
         if (body) options.body = JSON.stringify(body);
