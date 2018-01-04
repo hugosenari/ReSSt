@@ -17,7 +17,6 @@
         }
         return Promise.all(results);
     };
-    
     const waitVue = (...names) => loaded('Vue').then(Vue => vueUse(Vue, ...names));
     const loadCodeFromCache = window.loadCodeFromCache;
     const loadComponent = (name, path = '', namespace = ReSSt) => {

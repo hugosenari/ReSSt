@@ -1,7 +1,7 @@
-<md-tab id="service" md-label="Service">
+<md-tab id="service" md-label="Services">
     <md-input-container>
         <md-icon>http</md-icon>
-        <label>API Endpoint</label>
+        <label>API Endpoint {{time_to_run}}</label>
         <md-input v-model="endpoint"></md-input>
     </md-input-container>
     <md-input-container>
@@ -10,4 +10,8 @@
         <md-input v-model="key"></md-input>
     </md-input-container>
     <md-switch v-model="showReaded" id="show_readed" name="show_readed">Show Readed Items</md-switch>
+    <md-input-container>
+        <label>Loading time (ms)</label>
+        <md-input v-model="time_to_run" disabled></md-input>
+    </md-input-container>
 </md-tab>
