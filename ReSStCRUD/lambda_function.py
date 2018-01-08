@@ -250,11 +250,11 @@ class Operation(Subscriptable):
     @classmethod
     def _as_read(cls, table=None, uid=None, parentUid=None, uids=set(), unread=None, **data):
         readUpEx = '''REMOVE unread_since
-            SET readed_at = if_not_exists(readed_at, :_now)
-            SET ttl = _a_month'''
+            SET readed_at = if_not_exists(readed_at, :_now),
+            live_until = :_a_month'''
         unreadUpEx = '''REMOVE readed_at
-            SET unread_since = if_not_exists(unread_since, :_now)
-            SET ttl = _a_month'''
+            SET unread_since = if_not_exists(unread_since, :_now),
+            live_until = :_a_month'''
         upEx = unreadUpEx if unread else readUpEx
         values = {
             ':_now': now(),
