@@ -250,11 +250,16 @@ class Operation(Subscriptable):
     @classmethod
     def _as_read(cls, table=None, uid=None, parentUid=None, uids=set(), unread=None, **data):
         readUpEx = '''REMOVE unread_since
-            SET readed_at = if_not_exists(readed_at, :_now)'''
+            SET readed_at = if_not_exists(readed_at, :_now)
+            SET ttl = _a_month'''
         unreadUpEx = '''REMOVE readed_at
-            SET unread_since = if_not_exists(unread_since, :_now)'''
+            SET unread_since = if_not_exists(unread_since, :_now)
+            SET ttl = _a_month'''
         upEx = unreadUpEx if unread else readUpEx
-        values = {':_now': now()}
+        values = {
+            ':_now': now(),
+            ':_a_month': now() + (A_DAY * 30)
+        }
         def method(uid, parent):
             return table.update_item(Key=dict(uid=uid, parent=parent),
                 ExpressionAttributeValues=values,
@@ -281,15 +286,23 @@ class Handle:
     TABLE_NAME = os.environ.get(TABLE_ENV_VAR_NAME, DEFAULT_TABLE_NAME)
 
     def __init__(self, event):
-        self.method = event.get('httpMethod')
+        self.headers = event.get('headers') or {}
+        self._method = event.get('httpMethod')
         self.params = event.get('queryStringParameters')
         self.body =   event.get('body') or '{}'
-        self.operation = Operation.get(self.method)
+    
+    @property
+    def method(self):
+        return self.headers.get('x-method') or self._method
 
     @property
     def payload(self):
         return self.params or {} if self.method == 'GET' \
             else json.loads(self.body)
+    
+    @property
+    def operation(self):
+        return Operation.get(self.method)
 
     @property
     def handle(self):

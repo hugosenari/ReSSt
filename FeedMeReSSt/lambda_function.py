@@ -10,6 +10,7 @@ TABLE_ENV_VAR_NAME = 'ReSStCRUD_TABLE'
 DEFAULT_TABLE_NAME = 'ReSSt'
 ROOT = 'root'
 INDEX_NAME = 'feeds'
+A_DAY = 60 * 60 * 24
 now = lambda: int(datetime.now().timestamp())
 
 TABLE_NAME = os.environ.get(TABLE_ENV_VAR_NAME, DEFAULT_TABLE_NAME)
@@ -62,6 +63,7 @@ def filter_attrs(item):
     result = { k: item.get(k) or ' ' for k in keys }
     result['imported_at'] = now()
     result['unread_since'] = now()
+    result['ttl'] = now() + (A_DAY * 30)
     contents = item.get('content') or []
     result['content'] = [content.get('value') or ' ' for content in contents]
     medias = item.get('media_content') or []
