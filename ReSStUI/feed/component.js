@@ -2,7 +2,7 @@
 
 window.ReSSt.feed = window.ReSSt
     .mapState('feeds', 'backto', 'showReaded')
-    .then(({get, set, fetch}) => {
+    .then(({get, set, fetch, patchAs}) => {
         return {
             data () {
                 return {
@@ -44,11 +44,11 @@ window.ReSSt.feed = window.ReSSt
                 loadFeeds () {
                     this.registerKeys();
                     set('backto', '#/feeds');
-                    fetch(`uid=${this.uid}`).then(body => { this.self = body.Items[0]; });
+                    patchAs(`uid=${this.uid}`).then(body => { this.self = body.Items[0]; });
                     const unread = get('showReaded') ? '' : '&unread=1';
                     const query = this.$route.query; 
                     const last = query.last ? `&last=${query.last.replace(/{*}*/g, '')}` : '';
-                    return fetch(`parent=${this.uid}${unread}${last}&sort=1&Limit=40`)
+                    return patchAs(`parent=${this.uid}${unread}${last}&sort=1&Limit=40`)
                         .then(body => {
                             const items = (body.Items || [])
                                 .filter(i => i)

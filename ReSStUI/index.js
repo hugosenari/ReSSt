@@ -46,11 +46,13 @@
     }
     const setter = (obj, key, val) => { Vue.set(obj, key, val); save(key, val); };
     const setterObj = (obj, key, val) => { Vue.set(obj, key, val); saveString(key, val);};
-    const fetchData = ({ state, mode = 'cors', cache = 'default'}, params='', method='GET', body=null ) => {
+    const fetchData = ({ state, mode = 'cors', cache = 'default', header = {}}, params='', method='GET', body=null ) => {
         const { key, endpoint } = state || ReSSt.App.$store.state;
         const headers = new Headers();
         headers.append('X-Api-Key', key);
-        headers.append('Content-Type', 'application/json');
+        for (const k of Object.keys(header)) {
+            headers.append(k, header[k]);
+        }
         const options = { method, headers, mode, cache };
         if (body) options.body = JSON.stringify(body);
         return fetch(endpoint + '/ReSStCRUD?' + params, options)
@@ -71,6 +73,15 @@
                 obj.fetchData = fetchData;
                 obj.fetch = (params='', method='GET', body=null, opts={}) => 
                     fetchData(opts, params, method, body);
+                obj.patchAs = (params='', method='GET', opts={}) =>{
+                    body = params.split('&').reduce((b, i)=> {
+                        const [k, v] = i.split('=');
+                        b[k] = v;
+                        return b;
+                    }, {});
+                    opts['header'] = Object.assign({}, opts['header'], {'x-method': method});
+                    return fetchData(opts, '', 'PATCH', body);
+                };
                 return obj;
             }
         );

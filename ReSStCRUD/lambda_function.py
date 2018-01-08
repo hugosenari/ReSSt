@@ -297,7 +297,7 @@ class Handle:
 
     @property
     def payload(self):
-        return self.params or {} if self.method == 'GET' \
+        return self.params or {} if self._method == 'GET' \
             else json.loads(self.body)
     
     @property

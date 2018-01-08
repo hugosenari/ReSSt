@@ -2,7 +2,7 @@
 
 window.ReSSt.item = window.ReSSt
     .mapState('feeds', 'backto')
-    .then(({get, set, fetch}) => {
+    .then(({get, set, fetch, patchAs}) => {
         return {
             data () {
                 return {
@@ -36,7 +36,7 @@ window.ReSSt.item = window.ReSSt
                     this.setNav();
                     this.self = this.cachedSelf;
                     if(!this.self.loaded){
-                        return fetch('uid=' + this.uid).then(body => {
+                        return patchAs('uid=' + this.uid).then(body => {
                             fetch('', 'PATCH', { uid: this.uid });
                             if (this.self.uid === body.Items[0].uid) {
                                 this.$root.$emit('BeforeShowItem', body.Items[0]);

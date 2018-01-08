@@ -2,7 +2,7 @@
 
 window.ReSSt.cat = window.ReSSt
     .mapState('feeds', 'backto', 'showReaded')
-    .then(({get, set, fetch}) => {
+    .then(({get, set, fetch, patchAs}) => {
         return {
             data () {
                 return {
@@ -44,9 +44,9 @@ window.ReSSt.cat = window.ReSSt
                 loadFeeds () {
                     this.registerKeys();
                     set('backto', '#/feeds');
-                    fetch(`uid=${this.uid}`).then(body => { this.self = body.Items[0]; });
+                    patchAs(`uid=${this.uid}`).then(body => { this.self = body.Items[0]; });
                     const unread = get('showReaded') ? '' : '&unread=1';
-                    fetch(`tree=${this.uid}${unread}&Limit=40`).then(body => {
+                    patchAs(`tree=${this.uid}${unread}&Limit=40`).then(body => {
                         const items = (body.Items || [])
                             .reduce((r, v) => r.concat(v.Items || []), [])
                             .filter(i => i)

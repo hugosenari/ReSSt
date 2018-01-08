@@ -2,7 +2,7 @@
 
 window.ReSSt.feeds = window.ReSSt
     .mapState('categories', 'backto')
-    .then(({ categories, backto, set, fetch })  => {
+    .then(({ categories, backto, set, patchAs })  => {
         return {
             computed: { categories, backto },
             data () { return { loading: true }; },
@@ -10,7 +10,7 @@ window.ReSSt.feeds = window.ReSSt
             watch: { '$route': 'loadCategories' },
             methods: {
                 loadCategories () {
-                    fetch('tree=root')
+                    patchAs('tree=root')
                         .then(body => set('categories', body.Items))
                         .then(() => this.loading = false);
                     set('backto');
