@@ -40,7 +40,6 @@
             const VERSION = 0.0008;
             window.APP_VERSION  = VERSION;
             window.START_TIME = new Date().getTime();
-            window.APP_START_TIME = '' ;
             const DEBUG = window.location.toString().includes('debug=1');
             if (DEBUG) localStorage.setItem('version', new Date().getTime());
             const updated = localStorage.getItem('version') == VERSION;
