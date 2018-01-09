@@ -39,10 +39,13 @@
         (()=> {
             const VERSION = 0.0008;
             window.APP_VERSION  = VERSION;
-            window.START_TIME = new Date().getTime();
+            
             const DEBUG = window.location.toString().includes('debug=1');
             if (DEBUG) localStorage.setItem('version', new Date().getTime());
+            
             const updated = localStorage.getItem('version') == VERSION;
+            
+            window.START_TIME = new Date().getTime();
             const APP_START_TIMES = {};
             window.APP_START_TIMES = APP_START_TIMES;
             const appendTime = (src, type = '') => {
@@ -52,6 +55,7 @@
                 };
                 APP_START_TIMES[src.path][type] = elapsedTime;
             };
+
             const loadCodeFromCache = path => {
                 appendTime({ path }, 'download_begin');
                 localStorage.setItem('version', VERSION);
