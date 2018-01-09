@@ -150,12 +150,12 @@
         el: '#app',
         data () {
             return {
-                transitionName: 'fade'
+                transitionName: 'fade',
+                debugme: DEBUG
             };
         },
         computed: {
-            backto: { get () { return this.$store.state.backto; } }
-        },
+            backto: { get () { return this.$store.state.backto; } }},
         created () {
             window.addEventListener('keyup', event => {
                 if (event.keyCode) {
@@ -164,7 +164,8 @@
             });
         },
         components: {
-            'resstplugins':  loadComponent('plugin')
+            'resstplugins':  loadComponent('plugin'),
+            'resstdebug':  loadComponent('resstdebug')
         } ,
     };
     

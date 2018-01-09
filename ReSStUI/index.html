@@ -9,6 +9,7 @@
     <link rel="apple-touch-icon" href="favicon.svg" type="image/svg+xml">
     <link rel="dns-prefetch" href="unpkg.com"/>
     <link rel="dns-prefetch" href="fonts.googleapis.com"/>
+    <style>#app {visibility: hidden;}</style>
 </head>
 
 <body>
@@ -32,6 +33,7 @@
             </transition>
         </div>
         <resstplugins></resstplugins>
+        <resstdebug v-if="debugme"></resstdebug>
     </div>
     <script async>
         (()=> {
@@ -66,29 +68,6 @@
                 });
             };
             window.loadCodeFromCache = loadCodeFromCache;
-
-            const evaluate = js => {
-                try {
-                    if (js.text){
-                        appendTime(js, 'eval_begin');
-                        const result = eval(js.text);
-                        appendTime(js, 'eval_end');
-                        return result;
-                    }
-                } catch (e) {console.log(js.path, js.text, e);}
-            };
-            window.evaluate = evaluate;
-            loadCodeFromCache('index.js').then(evaluate);
-            loadCodeFromCache('//unpkg.com/vue@2.5.13/dist/vue.min.js')
-                .then((js) => {
-                    evaluate(js);
-                    loadCodeFromCache('//unpkg.com/vuex@3.0.1/dist/vuex.min.js')
-                        .then(evaluate);
-                    loadCodeFromCache('//unpkg.com/vue-router@3.0.1/dist/vue-router.min.js')
-                        .then(evaluate);
-                    loadCodeFromCache('//cdn.jsdelivr.net/npm/vue-material@0.8.1/dist/vue-material.min.js')
-                        .then(evaluate);
-                });
             
             const loadStyle = style => {
                 appendTime(style, 'eval_begin');
@@ -98,13 +77,37 @@
                 document.getElementsByTagName("head")[0].appendChild(element);
                 appendTime(style, 'eval_end');
             };
-            loadCodeFromCache('//fonts.googleapis.com/icon?family=Material+Icons')
+            loadCodeFromCache('https://fonts.googleapis.com/icon?family=Material+Icons')
                 .then(loadStyle);
-            loadCodeFromCache('//cdn.jsdelivr.net/npm/vue-material@0.8.1/dist/vue-material.min.css')
+            loadCodeFromCache('https://cdn.jsdelivr.net/npm/vue-material@0.8.1/dist/vue-material.min.css')
                 .then(loadStyle);
             loadCodeFromCache('style.css')
                 .then(loadStyle);
 
+            const evaluate = js => {
+                try {
+                    if (js.text){
+                        appendTime(js, 'eval_begin');
+                        const result = eval(js.text);
+                        appendTime(js, 'eval_end');
+                        return result;
+                    }
+                } catch (e) {
+                    console.log(js.path, js.text, e);
+                }
+            };
+            window.evaluate = evaluate;
+            const pVue = loadCodeFromCache('https://unpkg.com/vue@2.5.13/dist/vue.min.js')
+                .then(evaluate);
+            const evalAfterVue = source => pVue.then(() => evaluate(source));
+            loadCodeFromCache('index.js')
+                .then(evaluate);
+            loadCodeFromCache('https://unpkg.com/vuex@3.0.1/dist/vuex.min.js')
+                 .then(evalAfterVue);
+            loadCodeFromCache('https://unpkg.com/vue-router@3.0.1/dist/vue-router.min.js')
+                 .then(evalAfterVue);
+            loadCodeFromCache('https://cdn.jsdelivr.net/npm/vue-material@0.8.1/dist/vue-material.min.js')
+                 .then(evalAfterVue);
         })();
     </script>
 </body>
