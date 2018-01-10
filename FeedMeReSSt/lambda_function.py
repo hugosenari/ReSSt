@@ -65,7 +65,10 @@ def filter_attrs(item):
     result['unread_since'] = now()
     result['live_until'] = now() + (A_DAY * 30)
     contents = item.get('content') or []
-    result['content'] = [content.get('value') or ' ' for content in contents]
+    result['content'] = [
+        content.get('value') or ' ' for content in contents
+        if content != result.get('summary') 
+    ]
     medias = item.get('media_content') or []
     result['media_content'] = [media.get('value') or ' ' for media in medias]
     return result
