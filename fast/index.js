@@ -1,0 +1,1 @@
+document.getElementById('h').setAttribute('name', 'fast');
