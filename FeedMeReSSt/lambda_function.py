@@ -59,11 +59,11 @@ def set_uid(items):
         yield item
 
 def filter_attrs(item):
-    keys = ['id', 'title', 'link', 'summary', 'credit', 'author', 'published']
+    keys = ['id', 'title', 'link', 'summary', 'credit', 'author', 'published', 'updated']
     result = { k: item.get(k) or ' ' for k in keys }
     result['imported_at'] = now()
     result['unread_since'] = now()
-    result['live_until'] = now() + (A_DAY * 30)
+    result['live_until'] = now() + (A_DAY * 30 * 6)
     contents = item.get('content') or []
     result['content'] = [
         content.get('value') or ' ' for content in contents
@@ -81,7 +81,8 @@ def save_item(table, item):
         exAttVal = { ':' + k : v for k, v in i.items() }
         key = {'uid': item['uid'], 'parent': item['parent']}
         table.update_item(Key=key, UpdateExpression=upExp,
-            ExpressionAttributeValues= exAttVal)
+            ExpressionAttributeValues= exAttVal,
+            ConditionExpression='attribute_not_exists(uid)')
         return item
     except ClientError as e:
         if e.response['Error']['Code'] != 'ConditionalCheckFailedException':
