@@ -114,8 +114,8 @@ def lambda_handler(event, context):
     if sources or next_token:
         service = boto3.client('lambda')
         read_sources(service, {
-         'xmlUrls': sources,
-         'next_token': next_token
+            'xmlUrls': sources,
+            'next_token': next_token
         })
     else:
         print('Imported all sources')
