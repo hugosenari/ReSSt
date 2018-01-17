@@ -144,7 +144,7 @@ const App = {
     data () {
         return {
             transitionName: 'fade',
-            debugme: DEBUG
+            debugme: DEBUG || window.location.toString().includes('timing=1')
         };
     },
     computed: {
