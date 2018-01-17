@@ -2,14 +2,15 @@
 
 window.ReSSt.feeds = window.ReSSt
     .mapState('categories', 'backto')
-    .then(({ categories, backto, set, patchAs, DEBUG })  => {
+    .then(({ categories, backto, set, patchAs })  => {
         return {
             computed: { categories, backto },
-            data () { return { loading: !DEBUG }; },
+            data () { return { loading: true }; },
             created () { this.loadCategories(); },
             watch: { '$route': 'loadCategories' },
             methods: {
                 loadCategories () {
+                    this.loading = !Object.keys(this.categories).length;
                     patchAs('tree=root')
                         .then(body => set('categories', body.Items))
                         .then(() => this.loading = false);
