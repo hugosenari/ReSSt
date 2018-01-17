@@ -1,118 +1,78 @@
 <!DOCTYPE html>
-<html>
-
-<head>
-    <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
-    <meta charset="UTF-8">
-    <title>ReSStUI</title>
-    <link rel="icon" href="favicon.svg" type="image/svg+xml">
-    <link rel="apple-touch-icon" href="favicon.svg" type="image/svg+xml">
-    <link rel="dns-prefetch" href="unpkg.com"/>
-    <link rel="dns-prefetch" href="fonts.googleapis.com"/>
-    <style>#app {visibility: hidden;}</style>
-</head>
-
-<body>
-    <div id="app">
-        <md-toolbar class="md-dense">
-            <md-button :href="backto" v-if="backto" class="md-icon-button" aria-label="Back">
-                <md-icon>arrow_back</md-icon>
-            </md-button>
-
-            <router-link to="/" class="md-title" style="flex: 1" tag="h2">
-                ReSStUI
-            </router-link>
-
-            <router-link tag="md-button" to="/settings" class="md-icon-button" aria-label="Settings">
-                <md-icon>settings</md-icon>
-            </router-link>
-        </md-toolbar>
-        <div class="main-content">
-            <transition :name="transitionName">
-                <router-view></router-view>
-            </transition>
-        </div>
-        <resstplugins></resstplugins>
-        <resstdebug v-if="debugme"></resstdebug>
-    </div>
-    <script async>
-        (()=> {
-            const VERSION = 0.0008;
-            window.APP_VERSION  = VERSION;
-            
-            const DEBUG = window.location.toString().includes('debug=1');
-            if (DEBUG) localStorage.setItem('version', new Date().getTime());
-            
-            const updated = localStorage.getItem('version') == VERSION;
-            
-            window.START_TIME = new Date().getTime();
-            const APP_START_TIMES = {};
-            window.APP_START_TIMES = APP_START_TIMES;
-            const appendTime = (src, type = '') => {
-                const elapsedTime = new Date().getTime() - START_TIME;
-                APP_START_TIMES[src.path] = APP_START_TIMES[src.path] || {
-                    download_begin: 0, download_end: 0, eval_begin: 0, eval_end: 0
-                };
-                APP_START_TIMES[src.path][type] = elapsedTime;
-            };
-
-            const loadCodeFromCache = path => {
-                appendTime({ path }, 'download_begin');
-                localStorage.setItem('version', VERSION);
-                const text = localStorage.getItem(path);
-                if (text && updated) {
-                    appendTime({ path, text }, 'download_end');
-                    return Promise.resolve({ path, text });
-                }
-                return fetch(path).then(response => response.text()).then(text => {
-                    localStorage.setItem(path, text);
-                    appendTime({ path, text }, 'download_end');
-                    return { path, text };
-                });
-            };
-            window.loadCodeFromCache = loadCodeFromCache;
-            
-            const loadStyle = style => {
-                appendTime(style, 'eval_begin');
-                const element = document.createElement("style");
-                element.setAttribute("type", "text/css");
-                element.textContent = style.text.replace('sourceMappingURL=', '');
-                document.getElementsByTagName("head")[0].appendChild(element);
-                appendTime(style, 'eval_end');
-            };
-            loadCodeFromCache('https://fonts.googleapis.com/icon?family=Material+Icons')
-                .then(loadStyle);
-            loadCodeFromCache('https://cdn.jsdelivr.net/npm/vue-material@0.8.1/dist/vue-material.min.css')
-                .then(loadStyle);
-            loadCodeFromCache('style.css')
-                .then(loadStyle);
-
-            const evaluate = js => {
-                try {
-                    if (js.text){
-                        appendTime(js, 'eval_begin');
-                        const result = eval(js.text);
-                        appendTime(js, 'eval_end');
-                        return result;
-                    }
-                } catch (e) {
-                    console.log(js.path, js.text, e);
-                }
-            };
-            window.evaluate = evaluate;
-            const pVue = loadCodeFromCache('https://unpkg.com/vue@2.5.13/dist/vue.min.js')
-                .then(evaluate);
-            const evalAfterVue = source => pVue.then(() => evaluate(source));
-            loadCodeFromCache('index.js')
-                .then(evaluate);
-            loadCodeFromCache('https://unpkg.com/vuex@3.0.1/dist/vuex.min.js')
-                 .then(evalAfterVue);
-            loadCodeFromCache('https://unpkg.com/vue-router@3.0.1/dist/vue-router.min.js')
-                 .then(evalAfterVue);
-            loadCodeFromCache('https://cdn.jsdelivr.net/npm/vue-material@0.8.1/dist/vue-material.min.js')
-                 .then(evalAfterVue);
-        })();
-    </script>
-</body>
-
-</html>
+<html><head><title>ReSStUI</title>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="favicon.svg" type="image/svg+xml">
+<style>#app {visibility: hidden;}</style>
+</head><body>
+<div id="app">
+<md-toolbar class="md-dense">
+    <md-button :href="backto" v-if="backto" class="md-icon-button" aria-label="Back"><md-icon>arrow_back</md-icon></md-button>
+    <router-link to="/" class="md-title" style="flex: 1" tag="h2">ReSStUI</router-link>
+    <router-link tag="md-button" to="/settings" class="md-icon-button" aria-label="Settings"><md-icon>settings</md-icon></router-link>
+</md-toolbar>
+<div class="main-content"><transition :name="transitionName"><router-view></router-view></transition></div>
+<resstplugins></resstplugins><resstdebug v-if="debugme"></resstdebug>
+</div>
+<script async>
+(()=> {
+    const VERSION = 0.0008;
+    window.APP_VERSION  = VERSION;
+    const DEBUG = window.location.toString().includes('debug=1');
+    if (DEBUG) localStorage.setItem('version', new Date().getTime());
+    const updated = localStorage.getItem('version') == VERSION;
+    localStorage.setItem('version', VERSION);
+    window.START_TIME = new Date().getTime();
+    const APP_START_TIMES = {};
+    window.APP_START_TIMES = APP_START_TIMES;
+    const appendTime = (src, type = '') => {
+        const elapsedTime = new Date().getTime() - START_TIME;
+        APP_START_TIMES[src.path] = APP_START_TIMES[src.path] || {
+            download_begin: 0, download_end: 0, eval_begin: 0, eval_end: 0
+        };
+        APP_START_TIMES[src.path][type] = elapsedTime;
+    };
+    const loadCodeFromCache = path => {
+        appendTime({ path }, 'download_begin');
+        const text = localStorage.getItem(path);
+        if (text && updated) {
+            appendTime({ path, text }, 'download_end');
+            return Promise.resolve({ path, text });
+        }
+        return fetch(path).then(response => response.text()).then(text => {
+            localStorage.setItem(path, text);
+            appendTime({ path, text }, 'download_end');
+            return { path, text };
+        });
+    };
+    window.loadCodeFromCache = loadCodeFromCache;
+    const loadStyle = style => {
+        appendTime(style, 'eval_begin');
+        const element = document.createElement("style");
+        element.setAttribute("type", "text/css");
+        element.textContent = style.text.replace('sourceMappingURL=', '');
+        document.getElementsByTagName("head")[0].appendChild(element);
+        appendTime(style, 'eval_end');
+    };
+    loadCodeFromCache('https://fonts.googleapis.com/icon?family=Material+Icons').then(loadStyle);
+    loadCodeFromCache('https://cdn.jsdelivr.net/npm/vue-material@0.8.1/dist/vue-material.min.css').then(loadStyle);
+    loadCodeFromCache('style.css').then(loadStyle);
+    const evaluate = js => {
+        try {
+            if (js.text){
+                appendTime(js, 'eval_begin');
+                const result = eval(js.text);
+                appendTime(js, 'eval_end');
+                return result;
+            }
+        } catch (e) {console.log(js.path, js.text, e);}
+    };
+    window.evaluate = evaluate;
+    const pVue = loadCodeFromCache('https://unpkg.com/vue@2.5.13/dist/vue.min.js').then(evaluate);
+    const evalAfterVue = source => pVue.then(() => evaluate(source));
+    loadCodeFromCache('index.js').then(evaluate);
+    loadCodeFromCache('https://unpkg.com/vuex@3.0.1/dist/vuex.min.js').then(evalAfterVue);
+    loadCodeFromCache('https://unpkg.com/vue-router@3.0.1/dist/vue-router.min.js').then(evalAfterVue);
+    loadCodeFromCache('https://cdn.jsdelivr.net/npm/vue-material@0.8.1/dist/vue-material.min.js').then(evalAfterVue);
+})();
+</script></body></html>
