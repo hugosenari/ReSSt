@@ -1,6 +1,6 @@
 <md-content>
     <md-subheader class="md-primary">Categories</md-subheader>
-    <div class="loading" v-if="loading">
+    <div class="loading" v-if="loading || !categories">
         <md-progress md-indeterminate></md-progress>
     </div>
     <md-list>

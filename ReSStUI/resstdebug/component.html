@@ -1,6 +1,6 @@
 <md-content>
-    <md-subheader class="md-primary"><h4>Loading Time (ms)</h4> </md-subheader>
-    <md-table>
+    <md-subheader class="md-primary" v-if="show_time"><h4>Loading Time (ms)</h4> </md-subheader>
+    <md-table v-if="show_time">
         <md-table-header>
             <md-table-row>
                 <md-table-head>Path</md-table-head>
@@ -26,6 +26,24 @@
                 </md-table-cell>
                 <md-table-cell md-numeric>
                     {{value.eval_end}}(+{{value.eval_end - value.eval_begin}})
+                </md-table-cell>
+            </md-table-row>
+        </md-table-body>
+    </md-table>
+    <md-table v-if="show_time">
+        <md-table-header>
+            <md-table-row>
+                <md-table-head>Property</md-table-head>
+                <md-table-head md-numeric md-tooltip="Value"><md-icon>play_arrow</md-icon><md-icon>hourglass_full</md-icon></md-table-head>
+            </md-table-row>
+        </md-table-header>
+        <md-table-body>
+            <md-table-row v-for="(value, key) in timing" :key="key">
+                <md-table-cell>
+                    {{key}}
+                </md-table-cell>
+                <md-table-cell md-numeric>
+                    {{value}}
                 </md-table-cell>
             </md-table-row>
         </md-table-body>

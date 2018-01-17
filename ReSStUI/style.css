@@ -44,3 +44,11 @@ body {
 .embed-plugin-imgurian .embed-plugin-item .embed-plugin-frame iframe {
     max-width: 540px;
 }
+
+.md-list-item-expand > .md-list-expand{
+  display: none;
+}
+
+.md-list-item-expand.md-active > .md-list-expand{
+  display: block;
+}
