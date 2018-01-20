@@ -1,17 +1,17 @@
 /*jshint esversion: 6 */
 window.ReSSt.home = window.ReSSt
     .mapState('key', 'endpoint')
-    .then(computed => (
+    .then(({key, endpoint}) => (
         {
             created () { this.apiFromQuery(); },
             watch: { '$route': 'apiFromQuery' },
-            computed,
+            computed: { key, endpoint },
             methods: {
                 apiFromQuery () {
                     const query = this.$route.query;
                     if(query.key && query.endpoint) {
-                        computed.endpoint.set(query.endpoint);
-                        computed.key.set(query.key);
+                        endpoint.set(query.endpoint);
+                        key.set(query.key);
                         this.$router.push('feeds');
                     }
                 },

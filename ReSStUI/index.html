@@ -13,30 +13,31 @@
     <router-link tag="md-button" to="/settings" class="md-icon-button" aria-label="Settings"><md-icon>settings</md-icon></router-link>
 </md-toolbar>
 <div class="main-content"><transition :name="transitionName"><router-view></router-view></transition></div>
-<resstplugins></resstplugins><resstdebug v-if="debugme"></resstdebug>
+<resstplugins></resstplugins>
+<resstdebug v-if="debugme"></resstdebug>
 </div>
 <script async>
-(()=> {
-    const VERSION = 0.0010;
-    window.APP_VERSION  = VERSION;
-    const DEBUG = window.location.toString().includes('debug=1');
-    if (DEBUG) localStorage.setItem('version', new Date().getTime());
-    const updated = localStorage.getItem('version') == VERSION;
-    localStorage.setItem('version', VERSION);
-    window.START_TIME = new Date().getTime();
+window.ReSSt = (() => { // ENV
+    const APP_VERSION = 0.0012;
     const APP_START_TIMES = {};
-    window.APP_START_TIMES = APP_START_TIMES;
+    const START_TIME = new Date().getTime();
+    const DEBUG = window.location.toString().includes('debug=1');
+    const UPDATED = DEBUG || localStorage.getItem('version') == APP_VERSION;
+    localStorage.setItem('version', APP_VERSION);
+    return { APP_VERSION, APP_START_TIMES, START_TIME, UPDATED };
+})();
+
+((context) => { // BASIC LIB
     const appendTime = (src, type = '') => {
-        const elapsedTime = new Date().getTime() - START_TIME;
-        APP_START_TIMES[src.path] = APP_START_TIMES[src.path] || {
-            download_begin: 0, download_end: 0, eval_begin: 0, eval_end: 0
-        };
-        APP_START_TIMES[src.path][type] = elapsedTime;
+        const elapsedTime = new Date().getTime() - context.START_TIME;
+        context.APP_START_TIMES[src.path] = context.APP_START_TIMES[src.path] || 
+        { download_begin: 0, download_end: 0, eval_begin: 0, eval_end: 0 };
+        context.APP_START_TIMES[src.path][type] = elapsedTime;
     };
-    const loadCodeFromCache = path => {
+    const load = path => {
         appendTime({ path }, 'download_begin');
         const text = localStorage.getItem(path);
-        if (text && updated) {
+        if (text && context.UPDATED) {
             appendTime({ path, text }, 'download_end');
             return Promise.resolve({ path, text });
         }
@@ -46,19 +47,15 @@
             return { path, text };
         });
     };
-    window.loadCodeFromCache = loadCodeFromCache;
-    const loadStyle = style => {
-        appendTime(style, 'eval_begin');
+    const style = src => {
+        appendTime(src, 'eval_begin');
         const element = document.createElement("style");
         element.setAttribute("type", "text/css");
-        element.textContent = style.text.replace('sourceMappingURL=', '');
+        element.textContent = src.text.replace('sourceMappingURL=', '');
         document.getElementsByTagName("head")[0].appendChild(element);
-        appendTime(style, 'eval_end');
+        appendTime(src, 'eval_end');
     };
-    loadCodeFromCache('https://fonts.googleapis.com/icon?family=Material+Icons').then(loadStyle);
-    loadCodeFromCache('https://cdn.jsdelivr.net/npm/vue-material@0.8.1/dist/vue-material.min.css').then(loadStyle);
-    loadCodeFromCache('style.css').then(loadStyle);
-    const evaluate = js => {
+    const run = js => {
         try {
             if (js.text){
                 appendTime(js, 'eval_begin');
@@ -66,14 +63,32 @@
                 appendTime(js, 'eval_end');
                 return result;
             }
-        } catch (e) {console.log(js.path, js.text, e);}
+        } catch (e) {
+            console.log(js.path, js.text, e);
+        }
     };
-    window.evaluate = evaluate;
-    const pVue = loadCodeFromCache('https://unpkg.com/vue@2.5.13/dist/vue.min.js').then(evaluate);
-    const evalAfterVue = source => pVue.then(() => evaluate(source));
-    loadCodeFromCache('index.js').then(evaluate);
-    loadCodeFromCache('https://unpkg.com/vuex@3.0.1/dist/vuex.min.js').then(evalAfterVue);
-    loadCodeFromCache('https://unpkg.com/vue-router@3.0.1/dist/vue-router.min.js').then(evalAfterVue);
-    loadCodeFromCache('https://cdn.jsdelivr.net/npm/vue-material@0.8.1/dist/vue-material.min.js').then(evalAfterVue);
-})();
+    const after = cb => dep => src => dep.then(d => cb(src, d));
+    const loadAndRun = src => load(src).then(run);
+    const loadAndStyle = src => load(src).then(style);
+    const styleAfter = dep => after(style)(dep);
+    const runAfter = dep => after(run)(dep);
+    const loadAndRunAfter = (dep, src) => load(src).then(runAfter(dep));
+    const loadAndStyleAfter = (dep, src) => load(src).then(styleAfter(dep));
+    return Object.assign(context, {
+        load, after,
+        run, loadAndRun, loadAndRunAfter,
+        style, loadAndStyle, loadAndStyleAfter
+    });
+})(window.ReSSt);
+
+(({ loadAndStyle, loadAndRun, loadAndRunAfter }) => { // APP LOADING
+    loadAndStyle('style.css');
+    loadAndStyle('https://fonts.googleapis.com/icon?family=Material+Icons');
+    loadAndStyle('https://cdn.jsdelivr.net/npm/vue-material@0.8.1/dist/vue-material.min.css');
+    loadAndRun('index.js');
+    const vue = loadAndRun('https://unpkg.com/vue@2.5.13/dist/vue.min.js');
+    loadAndRunAfter(vue, 'https://unpkg.com/vuex@3.0.1/dist/vuex.min.js');
+    loadAndRunAfter(vue, 'https://unpkg.com/vue-router@3.0.1/dist/vue-router.min.js');
+    loadAndRunAfter(vue, 'https://cdn.jsdelivr.net/npm/vue-material@0.8.1/dist/vue-material.min.js');
+})(window.ReSSt);
 </script></body></html>

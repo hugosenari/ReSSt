@@ -2,7 +2,7 @@
 
 window.ReSSt.plugin = window.ReSSt
 .mapState('pluginsAutoPlay', 'plugins')
-.then(({ pluginsAutoPlay, loadCodeFromCache, plugins, set, get }) => {
+.then(({ pluginsAutoPlay, loadCodeFromCache, plugins, set, get, loadAndRun }) => {
     const pluginsLoaded = {};
     return {
         created () {
@@ -13,7 +13,7 @@ window.ReSSt.plugin = window.ReSSt
             addScript(name, src) {
                 if (pluginsLoaded[src]) return true;
                 pluginsLoaded[src] = true;
-                loadCodeFromCache(src).then(js => window.evaluate(js));
+                loadAndRun(src);
             },
             setPlugins(plugins) {
                 set('plugins', plugins)

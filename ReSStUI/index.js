@@ -1,10 +1,7 @@
 /*jshint esversion: 6 */
-(()=>{
-const DEBUG = window.location.toString().includes('debug=1');
-const ReSSt = { data: {} };
-window.ReSSt = ReSSt;
+((context)=>{
 const ROOT = '/';
-const loadingModules = {};
+const ReSSt = context;
 const loaded = (name) => new Promise(resolve => {
     const hasRessource = () => window[name] ? resolve(window[name]) : setTimeout(hasRessource, 30);
     hasRessource();
@@ -18,11 +15,11 @@ const vueUse = (Vue, ...names) => {
     return Promise.all(results);
 };
 const waitVue = (...names) => loaded('Vue').then(Vue => vueUse(Vue, ...names));
-const loadCodeFromCache = window.loadCodeFromCache;
+const load = ReSSt.load;
 const loadComponent = (name, path = '', namespace = ReSSt) => {
-    const tp = loadCodeFromCache(`${path}${name}/component.html`);
-    const js = loadCodeFromCache(`${path}${name}/component.js`).then((js) => {
-        window.evaluate(js);
+    const tp = load(`${path}${name}/component.html`);
+    const js = load(`${path}${name}/component.js`).then((js) => {
+        ReSSt.run(js);
         return namespace[name];
     });
     const promise = Promise.all([tp, js]).then(([template, component]) => {
@@ -57,12 +54,13 @@ const fetchData = ({ state, mode = 'cors', cache = 'default', header = {}}, para
 const lib = (obj = {}) => {
     return Promise.all([loaded('Vue'), loaded('Vuex')]).then(
         ([Vue, Vuex]) => {
-            obj.DEBUG = DEBUG;
+            obj.DEBUG = ReSSt.DEBUG;
             obj.Vue = Vue;
             obj.Vuex = Vuex;
             obj.app = () => ReSSt.App;
-            obj.loadCodeFromCache = loadCodeFromCache;
+            obj.loadCodeFromCache = load;
             obj.loadComponent = loadComponent;
+            obj.loadAndRun = ReSSt.loadAndRun;
             obj.fetchData = fetchData;
             obj.fetch = (params='', method='GET', body=null, opts={}) => 
                 fetchData(opts, params, method, body);
@@ -91,8 +89,8 @@ const mapState = (...args) => lib().then(l => {
     l.get = (attr) => l.app().$store.state[attr];
     return l;
 });
-window.ReSSt.lib = lib;
-window.ReSSt.mapState = mapState;    
+ReSSt.lib = lib;
+ReSSt.mapState = mapState;    
 const Store = {
     state: {
         endpoint: read('endpoint'),
@@ -144,7 +142,7 @@ const App = {
     data () {
         return {
             transitionName: 'fade',
-            debugme: DEBUG || window.location.toString().includes('timing=1')
+            debugme: ReSSt.DEBUG || window.location.toString().includes('timing=1')
         };
     },
     computed: {
@@ -179,4 +177,4 @@ waitVue('VueRouter', 'VueMaterial')
     ReSSt.App = new Vue(App);
 });
 
-})();
+})(window.ReSSt);
