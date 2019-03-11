@@ -4,7 +4,7 @@
     const name = 'vreddit';
     const urlMatch = /.+v\.redd\.it\//;
     const getUrlId = path => path && path.replace(/.+v\.redd\.it\/([^#?]+)/, '$1');
-    const iframeUrl = `'https://v.redd.it/'+ imageId + '/DASH_600_K'`;
+    const iframeUrl = `'https://v.redd.it/'+ imageId + '/DASH_480'`;
     const template = `<div class="embed-plugin embed-plugin-${name}"><md-content v-for="url in urls"><plugin-${name}-embed :uri="url"></plugin-${name}-embed></md-content></div>`;
     const buttonTemplate = `<div class="embed-plugin-item">
     <md-button class="md-icon-button md-raised" title="show this" @click="show = true" v-if="!show">
