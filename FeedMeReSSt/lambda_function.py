@@ -63,7 +63,7 @@ def filter_attrs(item):
     result = { k: item.get(k) or ' ' for k in keys }
     result['imported_at'] = now()
     result['unread_since'] = now()
-    result['live_until'] = now() + (A_DAY * 30 * 6)
+    result['live_until'] = now() + (A_DAY * 30)
     contents = item.get('content') or []
     result['content'] = [
         content.get('value') or ' ' for content in contents
