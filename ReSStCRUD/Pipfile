@@ -7,10 +7,8 @@ verify_ssl = true
 
 [packages]
 graphene = "*"
-awsclit = "*"
-awscli = "*"
-aws-cli = "*"
 boto3 = "*"
+fn = "*"
 
 [requires]
 python_version = "3.7"

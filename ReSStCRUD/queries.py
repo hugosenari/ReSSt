@@ -1,31 +1,47 @@
 import resolvers
 
-from schemas import Item
+from schemas import Item, Category
 from graphene import \
     Argument, ObjectType, String, ID, Int, Field, List, Schema, Boolean
 from graphene.types.json import JSONString
 
-def item_from(obj):
-    result = None
+
+def item_from(obj, of=Item):
     if obj:
-        kwd = dict(obj.items())
-        result = Item(**kwd)
-    return result
+        kwd = dict(obj)
+        return of(**kwd)
 
 
-class ItemQuery(ObjectType):
-    by_uid = Field(Item, uid=ID())
-    by_parent = List(Item, uid=ID())
-
-    def resolve_by_uid(self, info, uid):
-        items = resolvers.by_uid(uid)
-        return items and item_from(items[0]) or None
-
-    def resolve_by_parent(self, info, uid, unread=True, limit=40):
-        items = resolvers.by_parent(uid, unread=unread, limit=limit)
-        return (item_from(obj) for obj in items)
+def items_from(objs, of=Item):
+    for obj in objs:
+        yield item_from(obj, of)
 
 
-item = Schema(query=ItemQuery)
+class Queries(ObjectType):
+    items = List(Item, uids=List(ID))
+    items_by_parents = List(Item, uids=List(ID),
+        unread=Boolean(default_value=True), limit=Int(default_value=40))
+    categories = Field(Category, uids=List(ID))
+    categories_by_parents = List(Category, uids=List(ID),
+        limit=Int(default_value=40))
 
-__all__ = ['ItemQuery', 'item']
+    def resolve_items(self, info, uids):
+        objs = resolvers.by_uids(uids)
+        yield from items_from(objs)
+
+    def resolve_items_by_parent(self, info, uids, unread=True, limit=40):
+        objs = resolvers.by_parents(uids, unread=unread, limit=limit)
+        yield from items_from(objs)
+
+    def resolve_categories(self, info, uids):
+        objs = resolvers.by_uids(uids)
+        yield from items_from(objs, of=Category)
+
+    def resolve_categories_by_parent(self, info, uids, limit=40):
+        objs = resolvers.by_parents(uids, unread=False, limit=limit)
+        yield from items_from(objs, of=Category)
+
+
+itemQuery = Schema(query=Queries)
+
+__all__ = ['Queries', 'itemQuery']

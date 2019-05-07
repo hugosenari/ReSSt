@@ -16,19 +16,20 @@ def std_table(name=table_name, dynamodb=boto3.resource('dynamodb')):
 
 def get_items(of):
     items = of.get('Items', [])
+    print('items', items)
     return items or []
 
-@lru_cache()
-def by_uid(uid, table=std_table):
-    result = table().query(KeyConditionExpression=Key('uid').eq(uid))
-    return get_items(result)
+def by_uids(uids, table=std_table):
+    for uid in uids:
+        result = table().query(KeyConditionExpression=Key('uid').eq(uid))
+        yield from get_items(result)
 
-@lru_cache()
-def by_parent(uid, unread=True, limit=40, table=std_table):
+def by_parents(uids, unread=True, limit=40, table=std_table):
     index_name = unread and 'unread' or 'parent'
-    result = table().query(
-        Limit=limit,
-        IndexName=index_name,
-        KeyConditionExpression=Key('parent').eq(uid)
-    )
-    return get_items(result)
+    for uid in uids:
+        result = table().query(
+            Limit=limit,
+            IndexName=index_name,
+            KeyConditionExpression=Key('parent').eq(uid)
+        )
+        yield from get_items(result)
