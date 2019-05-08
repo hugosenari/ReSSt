@@ -1,6 +1,6 @@
-import resolvers
-
-from schemas import Item, Category
+import logging
+from .resolvers import by_parents, by_uids
+from .schemas import Item, Category
 from graphene import \
     Argument, ObjectType, String, ID, Int, Field, List, Schema, Boolean
 from graphene.types.json import JSONString
@@ -26,19 +26,20 @@ class Queries(ObjectType):
         limit=Int(default_value=40))
 
     def resolve_items(self, info, uids):
-        objs = resolvers.by_uids(uids)
+        logging.debug('resolve items', uids)
+        objs = by_uids(uids)
         yield from items_from(objs)
 
     def resolve_items_by_parent(self, info, uids, unread=True, limit=40):
-        objs = resolvers.by_parents(uids, unread=unread, limit=limit)
+        objs = by_parents(uids, unread=unread, limit=limit)
         yield from items_from(objs)
 
     def resolve_categories(self, info, uids):
-        objs = resolvers.by_uids(uids)
+        objs = by_uids(uids)
         yield from items_from(objs, of=Category)
 
     def resolve_categories_by_parent(self, info, uids, limit=40):
-        objs = resolvers.by_parents(uids, unread=False, limit=limit)
+        objs = by_parents(uids, unread=False, limit=limit)
         yield from items_from(objs, of=Category)
 
 

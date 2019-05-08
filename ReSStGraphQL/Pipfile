@@ -7,8 +7,6 @@ verify_ssl = true
 
 [packages]
 graphene = "*"
-boto3 = "*"
-fn = "*"
 
 [requires]
 python_version = "3.7"

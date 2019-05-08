@@ -1,5 +1,6 @@
 import os
 import boto3
+import logging
 
 from boto3.dynamodb.conditions import Key, Attr
 from functools import lru_cache
@@ -16,10 +17,10 @@ def std_table(name=table_name, dynamodb=boto3.resource('dynamodb')):
 
 def get_items(of):
     items = of.get('Items', [])
-    print('items', items)
     return items or []
 
 def by_uids(uids, table=std_table):
+    logging.debug(uids)
     for uid in uids:
         result = table().query(KeyConditionExpression=Key('uid').eq(uid))
         yield from get_items(result)

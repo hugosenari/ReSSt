@@ -1,0 +1,8 @@
+-i https://pypi.org/simple
+aniso8601==3.0.2
+graphene==2.1.3
+graphql-core==2.1
+graphql-relay==0.4.5
+promise==2.2.1
+rx==1.6.1
+six==1.12.0
