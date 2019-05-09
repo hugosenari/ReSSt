@@ -1,7 +1,7 @@
 import json
 from chalice import Chalice
 from chalicelib.logger import logger
-from chalicelib.queries import itemQuery
+from chalicelib.schema import itemSchema
 
 app = Chalice(app_name='ReSStGraphQL')
 
@@ -15,7 +15,7 @@ def index_get():
 def index_post():
     try:
       body = app.current_request.raw_body
-      query_result = itemQuery.execute(body.decode())
+      query_result = itemSchema.execute(body.decode())
       logger.info(json.dumps(query_result.data))
       return json.dumps({
         'data': query_result.data,

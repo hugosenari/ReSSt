@@ -1,6 +1,6 @@
 from .logger import logger
 from .resolvers import by_parents, by_uids
-from .schemas import Item, Category
+from .types import Item, Category
 from graphene import \
     Argument, ObjectType, String, ID, Int, Field, List, Schema, Boolean
 from graphene.types.json import JSONString
@@ -43,6 +43,4 @@ class Queries(ObjectType):
         yield from items_from(objs, of=Category)
 
 
-itemQuery = Schema(query=Queries)
-
-__all__ = ['Queries', 'itemQuery']
+__all__ = ['Queries']

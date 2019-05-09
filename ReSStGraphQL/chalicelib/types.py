@@ -1,4 +1,4 @@
-from graphene import ObjectType, Interface, String, ID, Int, Field, List, Schema
+from graphene import ObjectType, Interface, String, ID, Int,  List
 from uuid import uuid5, NAMESPACE_URL
 
 
