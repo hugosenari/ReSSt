@@ -1,4 +1,4 @@
-import logging
+from .logger import logger
 from .resolvers import by_parents, by_uids
 from .schemas import Item, Category
 from graphene import \
@@ -26,7 +26,7 @@ class Queries(ObjectType):
         limit=Int(default_value=40))
 
     def resolve_items(self, info, uids):
-        logging.debug('resolve items', uids)
+        logger.info(f'resolve uids {uids}')
         objs = by_uids(uids)
         yield from items_from(objs)
 

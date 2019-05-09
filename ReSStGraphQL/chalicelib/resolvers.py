@@ -1,9 +1,10 @@
 import os
 import boto3
-import logging
 
 from boto3.dynamodb.conditions import Key, Attr
 from functools import lru_cache
+from .logger import logger
+
 
 @lru_cache()
 def table_name():
@@ -20,7 +21,7 @@ def get_items(of):
     return items or []
 
 def by_uids(uids, table=std_table):
-    logging.debug(uids)
+    logger.info(f'by_uids {uids}')
     for uid in uids:
         result = table().query(KeyConditionExpression=Key('uid').eq(uid))
         yield from get_items(result)
