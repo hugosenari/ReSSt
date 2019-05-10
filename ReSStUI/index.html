@@ -18,7 +18,7 @@
 </div>
 <script async>
 window.ReSSt = (() => { // ENV
-    const APP_VERSION = 0.0013;
+    const APP_VERSION = 0.0014;
     const APP_START_TIMES = {};
     const START_TIME = new Date().getTime();
     const DEBUG = window.location.toString().includes('debug=1');
@@ -30,7 +30,7 @@ window.ReSSt = (() => { // ENV
 ((context) => { // BASIC LIB
     const appendTime = (src, type = '') => {
         const elapsedTime = new Date().getTime() - context.START_TIME;
-        context.APP_START_TIMES[src.path] = context.APP_START_TIMES[src.path] || 
+        context.APP_START_TIMES[src.path] = context.APP_START_TIMES[src.path] ||
         { download_begin: 0, download_end: 0, eval_begin: 0, eval_end: 0 };
         context.APP_START_TIMES[src.path][type] = elapsedTime;
     };
