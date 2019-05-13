@@ -8,7 +8,7 @@
         <md-button class="md-fab md-clean md-fixed md-mini" v-if="current" v-on:click="markAsRead">
             <md-icon>done</md-icon>
         </md-button>
-        <md-button class="md-fab md-clean md-fixed md-mini" v-if="!current" v-on:click="markAsRead">
+        <md-button class="md-fab md-clean md-fixed md-mini" v-if="empty" v-on:click="markAsRead">
             <md-icon>autorenew</md-icon>
         </md-button>
     </md-subheader>
