@@ -67,7 +67,7 @@ class By(Subscriptable):
     item    = lambda x: Attr('link').exists()
     feed    = lambda x: Attr('xmlUrl').exists()
     cat     = lambda x: Attr('link').not_exists() & Attr('xmlUrl').not_exists()
-    n_item  = lambda x: Attr('link').not_exists() 
+    n_item  = lambda x: Attr('link').not_exists()
     unread  = lambda x: By._day(x, Attr('unread_since').exists())
     read    = lambda x: By._day(x, Attr('readed_at').exists())
     star    = lambda x: By._day(x, Attr('stared').exists())
@@ -157,7 +157,7 @@ class ScanBy(Subscriptable):
         if current_depth < max_depth:
             del data['parent']
             for item in result['Items']:
-                item['Items'] = cls._tree( 
+                item['Items'] = cls._tree(
                     item['uid'], table, current_depth+1, max_depth, **data
                 )['Items']
         return result
@@ -264,7 +264,7 @@ class Operation(Subscriptable):
             return table.update_item(Key=dict(uid=uid, parent=parent),
                 ExpressionAttributeValues=values,
                 UpdateExpression=upEx)
-        return cls._do_update(method, table=table, uid=uid, 
+        return cls._do_update(method, table=table, uid=uid,
                               parentUid=parentUid, uids=uids, **data)
 
     @classmethod
@@ -284,13 +284,14 @@ class Operation(Subscriptable):
 
 class Handle:
     TABLE_NAME = os.environ.get(TABLE_ENV_VAR_NAME, DEFAULT_TABLE_NAME)
+    table = boto3.resource('dynamodb').Table(TABLE_NAME)
 
     def __init__(self, event):
         self.headers = event.get('headers') or {}
         self._method = event.get('httpMethod')
         self.params = event.get('queryStringParameters')
         self.body =   event.get('body') or '{}'
-    
+
     @property
     def method(self):
         return self.headers.get('x-method') or self._method
@@ -299,7 +300,7 @@ class Handle:
     def payload(self):
         return self.params or {} if self._method == 'GET' \
             else json.loads(self.body)
-    
+
     @property
     def operation(self):
         return Operation.get(self.method)
@@ -308,8 +309,7 @@ class Handle:
     def handle(self):
         if self.operation:
             try:
-                table = boto3.resource('dynamodb').Table(self.TABLE_NAME)
-                return self.operation(self.payload, table)
+                return self.operation(self.payload, self.table)
             except Exception as err:
                 return err
         return ValueError('Unsupported method "{}"'.format(self.method))
