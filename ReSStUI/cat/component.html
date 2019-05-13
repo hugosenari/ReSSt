@@ -5,19 +5,22 @@
         <md-button class="md-fab md-clean md-fixed md-mini" v-if="current" v-bind:href="current.link"  target="_blank">
             <md-icon>open_in_browser</md-icon>
         </md-button>
-        <md-button class="md-fab md-clean md-fixed md-mini" v-if="current" v-on:click="markAsRead"  target="_blank">
+        <md-button class="md-fab md-clean md-fixed md-mini" v-if="current" v-on:click="markAsRead">
             <md-icon>done</md-icon>
+        </md-button>
+        <md-button class="md-fab md-clean md-fixed md-mini" v-if="!current" v-on:click="markAsRead">
+            <md-icon>autorenew</md-icon>
         </md-button>
     </md-subheader>
     <div class="loading" v-if="loading">
         <md-progress md-indeterminate></md-progress>
     </div>
     <md-list>
-        <md-list-item v-for="item in myItems" v-bind:class="{ 'md-primary': item.uid == current.uid }">
+        <md-list-item v-for="item in myItems" v-bind:class="{ 'md-primary': current && item.uid == current.uid }">
             <router-link :to="'./' + self.uid + '/_/' + item.uid">
                 {{item.title}}
-                <md-icon v-if="item.uid == current.uid" class="material-icons">label_outline</md-icon>
-                <md-icon v-if="item.uid != current.uid" class="material-icons">arrow_forward</md-icon>
+                <md-icon v-if="current && item.uid == current.uid" class="material-icons">label_outline</md-icon>
+                <md-icon v-if="current && item.uid != current.uid" class="material-icons">arrow_forward</md-icon>
             </router-link>
         </md-list-item>
     </md-list>

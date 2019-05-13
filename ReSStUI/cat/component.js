@@ -79,6 +79,8 @@ window.ReSSt.cat = window.ReSSt
                             this.moveTo(this.getNext());
                             this.moveTo(this.getNext(-1));
                         }
+                    } else {
+                        this.loadFeeds();
                     }
                 },
                 nextItem() { this.moveTo(this.getNext()); },

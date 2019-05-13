@@ -24,7 +24,7 @@ window.ReSSt = (() => { // ENV
     const DEBUG = window.location.toString().includes('debug=1');
     const UPDATED = DEBUG || localStorage.getItem('version') == APP_VERSION;
     localStorage.setItem('version', APP_VERSION);
-    return { APP_VERSION, APP_START_TIMES, START_TIME, UPDATED };
+    return { APP_VERSION, APP_START_TIMES, START_TIME, UPDATED, DEBUG };
 })();
 
 ((context) => { // BASIC LIB
