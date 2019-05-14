@@ -1,8 +1,8 @@
 <md-content>
+    <md-subheader class="md-primary">
+        <h4>{{self.title}} <span class="md-title" v-if="empty">(Empty)</span></h4>
+    </md-subheader>
     <div class="md-scrollbar">
-        <md-subheader class="md-primary">
-            <h4>{{self.title}} <span class="md-title" v-if="empty">(Empty)</span></h4>
-        </md-subheader>
         <div class="loading" v-if="loading">
             <md-progress md-indeterminate></md-progress>
         </div>
@@ -16,13 +16,9 @@
             </md-list-item>
         </md-list>
     </div>
-    <md-button class="md-fab md-fab-bottom-center md-clean md-fixed md-mini" v-if="current" v-bind:href="current.link"  target="_blank">
-        <md-icon>open_in_browser</md-icon>
-    </md-button>
-    <md-button class="md-fab md-fab-bottom-right md-clean md-fixed md-mini" v-if="current" v-on:click="markAsRead">
-        <md-icon>done</md-icon>
-    </md-button>
-    <md-button class="md-fab md-fab-bottom-right md-clean md-fixed md-mini" v-if="empty" v-on:click="markAsRead">
-        <md-icon>autorenew</md-icon>
-    </md-button>
+    <md-bottom-bar>
+        <md-bottom-bar-item v-if="empty" v-on:click="markAsRead" md-icon="autorenew"></md-bottom-bar-item>
+        <md-bottom-bar-item v-if="current" v-bind:href="current.link"  target="_blank" md-icon="open_in_browser"></md-bottom-bar-item>
+        <md-bottom-bar-item v-if="current" v-on:click="markAsRead" md-icon="done"></md-bottom-bar-item>
+    </md-bottom-bar>
 </md-content>

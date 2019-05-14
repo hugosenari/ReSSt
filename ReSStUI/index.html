@@ -7,18 +7,18 @@
 <style>#app {visibility: hidden;}</style>
 </head><body>
 <div id="app">
-<md-toolbar class="md-dense">
-    <md-button :href="backto" v-if="backto" class="md-icon-button" aria-label="Back"><md-icon>arrow_back</md-icon></md-button>
-    <router-link to="/" class="md-title" style="flex: 1" tag="h2">ReSStUI</router-link>
-    <router-link tag="md-button" to="/settings" class="md-icon-button" aria-label="Settings"><md-icon>settings</md-icon></router-link>
-</md-toolbar>
-<div class="main-content"><transition :name="transitionName"><router-view></router-view></transition></div>
-<resstplugins></resstplugins>
-<resstdebug v-if="debugme"></resstdebug>
+    <md-toolbar class="md-dense">
+        <md-button :href="backto" v-if="backto" class="md-icon-button" aria-label="Back"><md-icon>arrow_back</md-icon></md-button>
+        <router-link to="/" class="md-title" style="flex: 1" tag="h2">ReSStUI</router-link>
+        <router-link tag="md-button" to="/settings" class="md-icon-button" aria-label="Settings"><md-icon>settings</md-icon></router-link>
+    </md-toolbar>
+    <div class="main-content"><transition :name="transitionName"><router-view></router-view></transition></div>
+    <resstplugins/>
+    <resstdebug v-if="debugme"/>
 </div>
 <script async>
 window.ReSSt = (() => { // ENV
-    const APP_VERSION = 0.0017;
+    const APP_VERSION = 0.0018;
     const APP_START_TIMES = {};
     const START_TIME = new Date().getTime();
     const DEBUG = window.location.toString().includes('debug=1');
