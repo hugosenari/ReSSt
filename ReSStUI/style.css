@@ -1,13 +1,14 @@
 body {
-  min-height: 100%;
+  max-height: 100%;
   display: block;
 }
 
 #app {
   visibility: hidden;
   height: 100%;
-  min-height: 100%;
+  max-height: 100%;
   display: block;
+  overflow: auto;
 }
 .md-theme-default #app { visibility: visible; }
 
@@ -15,10 +16,16 @@ body {
   padding: 16px;
 }
 
+#app .md-scrollbar {
+  display: block;
+  height: 89vh;
+  overflow: auto;
+}
+
 :focus { outline: none; }
 ::-moz-focus-inner { border: 0; }
 
-@keyframes spin { 
+@keyframes spin {
   from { background-size: 50px 0; }
 	to { background-size: 50px 50px; }
 }
