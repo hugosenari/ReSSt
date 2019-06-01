@@ -3,6 +3,7 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1"/>
 <link href="favicon.ico" type="image/x-icon"  rel="shortcut icon"/>
 <link href="favicon.svg" type="image/svg+xml" rel="icon"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <style>#app {visibility: hidden;}</style>
 </head><body>
 <div id="app">
@@ -25,7 +26,7 @@
 </div>
 <script async>
 window.ReSSt = (() => { // ENV
-    const APP_VERSION = 0.0020;
+    const APP_VERSION = 0.0021;
     const APP_START_TIMES = {};
     const START_TIME = new Date().getTime();
     const DEBUG = window.location.toString().includes('debug=1');
@@ -90,7 +91,6 @@ window.ReSSt = (() => { // ENV
 
 (({ loadAndStyle, loadAndRun, loadAndRunAfter }) => { // APP LOADING
     loadAndStyle('style.css');
-    loadAndStyle('https://cdn.jsdelivr.net/gh/google/material-design-icons@3.0.1/iconfont/material-icons.min.css');
     loadAndStyle('https://cdn.jsdelivr.net/npm/vue-material@0.8.1/dist/vue-material.min.css');
     loadAndRun('index.js');
     const vue = loadAndRun('https://unpkg.com/vue@2.5.13/dist/vue.min.js');
