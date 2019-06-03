@@ -3,7 +3,6 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1"/>
 <link href="favicon.ico" type="image/x-icon"  rel="shortcut icon"/>
 <link href="favicon.svg" type="image/svg+xml" rel="icon"/>
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <style>#app {visibility: hidden;}</style>
 </head><body>
 <div id="app">
@@ -26,7 +25,7 @@
 </div>
 <script async>
 window.ReSSt = (() => { // ENV
-    const APP_VERSION = 0.0021;
+    const APP_VERSION = 0.0023;
     const APP_START_TIMES = {};
     const START_TIME = new Date().getTime();
     const DEBUG = window.location.toString().includes('debug=1');
@@ -55,11 +54,20 @@ window.ReSSt = (() => { // ENV
             return { path, text };
         });
     };
+    const basePathOf = path => path.split('/').slice(0, -1).join('/');
+    const relativeUrlToAbs = (txt, basePath) => txt.replace(
+        /(url\('?"?)(\.?\.?\/?[^)]+)('?"?\))/gi,
+        `$1${basePath}/$2$3`
+    );
     const style = src => {
         appendTime(src, 'eval_begin');
+        const basePath = basePathOf(src.path);
         const element = document.createElement("style");
         element.setAttribute("type", "text/css");
-        element.textContent = src.text.replace('sourceMappingURL=', '');
+        element.textContent = relativeUrlToAbs(
+            src.text.replace('sourceMappingURL=', ''),
+            basePath
+        );
         document.getElementsByTagName("head")[0].appendChild(element);
         appendTime(src, 'eval_end');
     };
@@ -90,6 +98,7 @@ window.ReSSt = (() => { // ENV
 })(window.ReSSt);
 
 (({ loadAndStyle, loadAndRun, loadAndRunAfter }) => { // APP LOADING
+    loadAndStyle('https://cdn.jsdelivr.net/gh/google/material-design-icons@3.0.1/iconfont/material-icons.min.css');
     loadAndStyle('style.css');
     loadAndStyle('https://cdn.jsdelivr.net/npm/vue-material@0.8.1/dist/vue-material.min.css');
     loadAndRun('index.js');
