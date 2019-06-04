@@ -66,3 +66,26 @@ body {
 .article-content {
   padding: 0 16px;
 }
+
+@keyframes rapid-serial-visual-presentation {
+  0% {
+    transform: translateX(0);
+    visibility: visible;
+  }
+
+  100% {
+    transform: translateX(-80%);
+  }
+}
+
+.md-primary a.md-list-item-container span {
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  animation-name: rapid-serial-visual-presentation;
+  animation-duration: 5s;
+  animation-delay: 1s;
+}
+
+.md-primary a.md-list-item-container:hover span {
+  animation-play-state: paused;
+}

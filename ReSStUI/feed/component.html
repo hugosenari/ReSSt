@@ -9,7 +9,7 @@
         <md-list>
             <md-list-item v-for="item in myItems" v-bind:class="{ 'md-primary': item.uid == current.uid }">
                 <router-link :to="'./' + self.uid + '/' + item.uid">
-                    {{item.title}}
+                    <span>{{item.title}}</span>
                     <md-icon v-if="current && item.uid == current.uid" class="material-icons">label_outline</md-icon>
                     <md-icon v-if="current && item.uid != current.uid" class="material-icons">arrow_forward</md-icon>
                 </router-link>
