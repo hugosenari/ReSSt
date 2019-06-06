@@ -7,12 +7,19 @@ window.ReSSt.feed = window.ReSSt
             data () {
                 return {
                     loading: true,
-                    self: {},
                     nextPage: null,
                     selected: 0
                 };
             },
             computed: {
+                self () {
+                    const categories = get('categories') || [];
+                    const [self = {}] = categories.reduce((a, i) => [
+                        ...a,
+                        (i.Items ||[]).find(c => c.uid === this.uid)
+                    ], []).filter(c => c);
+                    return self;
+                },
                 uid () { return this.$route.params.feed; },
                 myItems () {
                     const feeds = get('feeds') || {};
@@ -25,8 +32,9 @@ window.ReSSt.feed = window.ReSSt
                 current () { return this.myItems[this.currentKey]; },
                 empty () { return !this.loading && !this.current; }
             },
-            created () { this.loadFeeds(); },
-            watch: { '$route': 'loadFeeds' },
+            beforeRouteEnter (to, from, next) {
+                next(vm => vm.loadFeeds() || next() );
+            },
             methods: {
                 registerKeys () {
                     this.$root.$off('WindowKeyUp');
@@ -46,7 +54,7 @@ window.ReSSt.feed = window.ReSSt
                     set('backto', '#/feeds');
                     patchAs(`uid=${this.uid}`).then(body => { this.self = body.Items[0]; });
                     const unread = get('showReaded') ? '' : '&unread=1';
-                    const query = this.$route.query; 
+                    const query = this.$route.query;
                     const last = query.last ? `&last=${query.last.replace(/{*}*/g, '')}` : '';
                     return patchAs(`parent=${this.uid}${unread}${last}&sort=1&Limit=40`)
                         .then(body => {

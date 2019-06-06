@@ -7,12 +7,16 @@ window.ReSSt.cat = window.ReSSt
             data () {
                 return {
                     loading: true,
-                    self: {},
                     nextPage: null,
                     selected: 0
                 };
             },
             computed: {
+                self () {
+                    const categories = get('categories') || [];
+                    const [self] = categories.filter(c => c.uid === this.uid);
+                    return self || {};
+                },
                 uid () { return this.$route.params.category; },
                 myItems () {
                     const feeds = get('feeds') || {};
@@ -25,8 +29,9 @@ window.ReSSt.cat = window.ReSSt
                 current () { return this.myItems[this.currentKey]; },
                 empty () { return !this.loading && !this.current; }
             },
-            created () { this.loadFeeds(); },
-            watch: { '$route': 'loadFeeds' },
+            beforeRouteEnter (to, from, next) {
+                next(vm => vm.loadFeeds() || next() );
+            },
             methods: {
                 registerKeys () {
                     this.$root.$off('WindowKeyUp');

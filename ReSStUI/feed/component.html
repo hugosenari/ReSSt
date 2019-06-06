@@ -1,11 +1,8 @@
 <md-content>
     <md-subheader class="md-primary">
-        <h4>{{self.title}} <span class="md-title" v-if="empty">(Empty)</span></h4>
+        <h4>{{self.title}}&nbsp;<span class="md-title" v-if="empty">(Empty)</span></h4>
     </md-subheader>
     <div class="md-scrollbar">
-        <div class="loading" v-if="loading">
-            <md-progress md-indeterminate></md-progress>
-        </div>
         <md-list>
             <md-list-item v-for="item in myItems" v-bind:class="{ 'md-primary': item.uid == current.uid }" :key="item.uid">
                 <router-link :to="'./' + self.uid + '/' + item.uid">
