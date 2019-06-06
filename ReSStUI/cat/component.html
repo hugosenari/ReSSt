@@ -7,9 +7,11 @@
             <md-progress md-indeterminate></md-progress>
         </div>
         <md-list>
-            <md-list-item v-for="item in myItems" v-bind:class="{ 'md-primary': current && item.uid == current.uid }">
+            <md-list-item v-for="item in myItems" v-bind:class="{ 'md-primary': current && item.uid == current.uid }" :key="item.uid">
                 <router-link :to="'./' + self.uid + '/_/' + item.uid">
-                    <span>{{item.title}}</span>
+                    <span v-bind:style="{ 'animation-duration': item.title.length / 15  + 's' }">
+                        {{item.title}}
+                    </span>
                     <md-icon v-if="current && item.uid == current.uid" class="material-icons">label_outline</md-icon>
                     <md-icon v-if="current && item.uid != current.uid" class="material-icons">arrow_forward</md-icon>
                 </router-link>
