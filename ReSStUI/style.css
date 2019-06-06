@@ -82,7 +82,7 @@ body {
   animation-iteration-count: infinite;
   animation-timing-function: linear;
   animation-name: rapid-serial-visual-presentation;
-  animation-delay: 2s;
+  animation-delay: 1s;
 }
 
 .md-primary a.md-list-item-container:hover span {
