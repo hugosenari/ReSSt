@@ -1,0 +1,15 @@
+
+{
+  "background_color": "white",
+  "description": "ReSSt RSS reader.",
+  "display": "minimal-ui",
+  "icons": [
+    {
+      "src": "favicon.svg",
+      "sizes": "72x72 96x96 128x128 256x256"
+    }
+  ],
+  "name": "ReSSt",
+  "short_name": "ReSSt",
+  "start_url": "/ReSSt/ReSStUI/index.html"
+}
